@@ -1,0 +1,233 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-brand-accent: var(--brand-accent);
+  --color-action-match: var(--action-match);
+  --color-action-training: var(--action-training);
+  --color-action-tournament: var(--action-tournament);
+  --color-action-cup: var(--action-cup);
+  --color-action-other: var(--action-other);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Pitch Green / Kit Navy palette — see APP_DESIGN.md */
+:root {
+  --background: oklch(0.98 0.004 152);
+  --foreground: oklch(0.14 0.02 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.14 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.14 0.02 250);
+  --primary: oklch(0.62 0.15 152);
+  --primary-foreground: oklch(0.99 0.005 152);
+  --secondary: oklch(0.93 0.015 152);
+  --secondary-foreground: oklch(0.28 0.05 152);
+  --muted: oklch(0.93 0.006 250);
+  --muted-foreground: oklch(0.48 0.02 250);
+  --accent: oklch(0.91 0.02 250);
+  --accent-foreground: oklch(0.22 0.06 250);
+  --brand-accent: oklch(0.55 0.18 250);
+  --destructive: oklch(0.577 0.245 27);
+  --border: oklch(0.89 0.008 250);
+  --input: oklch(0.89 0.008 250);
+  --ring: oklch(0.62 0.15 152);
+  --chart-1: oklch(0.62 0.15 152);
+  --chart-2: oklch(0.55 0.18 250);
+  --chart-3: oklch(0.70 0.14 85);
+  --chart-4: oklch(0.55 0.20 300);
+  --chart-5: oklch(0.60 0.19 25);
+  --radius: 0.75rem;
+  --shadow-glow: 0 0 24px oklch(0.62 0.15 152 / 0.30);
+  --shadow-glow-navy: 0 0 24px oklch(0.55 0.18 250 / 0.30);
+
+  --action-match: oklch(0.60 0.19 25);
+  --action-training: oklch(0.58 0.14 230);
+  --action-tournament: oklch(0.70 0.14 85);
+  --action-cup: oklch(0.55 0.20 300);
+  --action-other: oklch(0.65 0.01 250);
+
+  --timeline-past-opacity: 1;
+  --timeline-upcoming-filter: grayscale(0.7) opacity(0.55);
+  --timeline-next-ring: 0 0 0 3px var(--team-primary, var(--primary));
+
+  --sidebar: oklch(0.96 0.008 250);
+  --sidebar-foreground: oklch(0.14 0.02 250);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: oklch(0.91 0.02 250);
+  --sidebar-accent-foreground: oklch(0.22 0.06 250);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+}
+
+.dark {
+  --background: oklch(0.11 0.012 250);
+  --foreground: oklch(0.95 0.004 152);
+  --card: oklch(0.16 0.016 250);
+  --card-foreground: oklch(0.95 0.004 152);
+  --popover: oklch(0.16 0.016 250);
+  --popover-foreground: oklch(0.95 0.004 152);
+  --primary: oklch(0.70 0.16 152);
+  --primary-foreground: oklch(0.10 0.01 152);
+  --secondary: oklch(0.24 0.02 152);
+  --secondary-foreground: oklch(0.95 0.004 152);
+  --muted: oklch(0.22 0.014 250);
+  --muted-foreground: oklch(0.62 0.016 250);
+  --accent: oklch(0.24 0.03 250);
+  --accent-foreground: oklch(0.95 0.004 152);
+  --brand-accent: oklch(0.65 0.17 250);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.70 0.16 152);
+  --chart-1: oklch(0.70 0.16 152);
+  --chart-2: oklch(0.65 0.17 250);
+  --chart-3: oklch(0.76 0.15 85);
+  --chart-4: oklch(0.62 0.21 300);
+  --chart-5: oklch(0.66 0.20 25);
+  --shadow-glow: 0 0 28px oklch(0.70 0.16 152 / 0.35);
+  --shadow-glow-navy: 0 0 28px oklch(0.65 0.17 250 / 0.35);
+
+  --action-match: oklch(0.66 0.20 25);
+  --action-training: oklch(0.65 0.15 230);
+  --action-tournament: oklch(0.76 0.15 85);
+  --action-cup: oklch(0.62 0.21 300);
+  --action-other: oklch(0.68 0.01 250);
+
+  --sidebar: oklch(0.14 0.014 250);
+  --sidebar-foreground: oklch(0.95 0.004 152);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: oklch(0.24 0.03 250);
+  --sidebar-accent-foreground: oklch(0.95 0.004 152);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+}
+
+/* Team-brand scope — see APP_DESIGN.md "Team-brand override tokens".
+   Applied only inside team-scoped surfaces; falls back to app --primary. */
+.team-scope {
+  --primary: var(--team-primary, var(--primary));
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .gradient-brand {
+    background: linear-gradient(135deg, var(--primary), var(--brand-accent));
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, var(--primary), var(--brand-accent));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .gradient-hero {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--primary) 12%, transparent),
+      transparent
+    );
+  }
+  .glass {
+    backdrop-filter: blur(16px);
+    background: color-mix(in oklch, var(--background) 75%, transparent);
+    border: 1px solid var(--border);
+  }
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  .shadow-glow-navy {
+    box-shadow: var(--shadow-glow-navy);
+  }
+}
+
+@keyframes timeline-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-next {
+  0%,
+  100% {
+    box-shadow: var(--timeline-next-ring);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklch, var(--team-primary, var(--primary)) 40%, transparent);
+  }
+}
+
+.animate-timeline-in {
+  animation: timeline-in 0.3s ease-out;
+}
+
+.animate-pulse-next {
+  animation: pulse-next 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-timeline-in,
+  .animate-pulse-next {
+    animation: none;
+  }
+}

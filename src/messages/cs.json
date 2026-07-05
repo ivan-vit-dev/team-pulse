@@ -1,0 +1,47 @@
+{
+  "common": {
+    "appName": "TeamPulse",
+    "loading": "Načítání…",
+    "cancel": "Zrušit",
+    "save": "Uložit změny",
+    "saving": "Ukládám…"
+  },
+  "nav": {
+    "myTeams": "Moje týmy",
+    "settings": "Nastavení",
+    "login": "Přihlásit se",
+    "register": "Registrovat se",
+    "logout": "Odhlásit se"
+  },
+  "auth": {
+    "loginTitle": "Přihlášení do TeamPulse",
+    "registerTitle": "Vytvořte si účet TeamPulse",
+    "email": "E-mail",
+    "password": "Heslo",
+    "displayName": "Zobrazované jméno",
+    "loginButton": "Přihlásit se",
+    "registerButton": "Vytvořit účet",
+    "orContinueWith": "nebo pokračujte přes",
+    "continueWithGoogle": "Pokračovat přes Google",
+    "noAccount": "Nemáte účet?",
+    "haveAccount": "Už máte účet?",
+    "signUp": "Zaregistrovat se",
+    "signIn": "Přihlásit se",
+    "invalidCredentials": "Neplatný e-mail nebo heslo.",
+    "emailInUse": "Účet s tímto e-mailem již existuje.",
+    "genericError": "Něco se pokazilo. Zkuste to prosím znovu."
+  },
+  "profile": {
+    "title": "Nastavení profilu",
+    "displayName": "Zobrazované jméno",
+    "language": "Jazyk",
+    "avatar": "Avatar",
+    "uploadAvatar": "Nahrát fotku",
+    "notifications": "Nastavení oznámení",
+    "emailNotifications": "E-mailová oznámení",
+    "pushNotifications": "Push oznámení",
+    "myTeams": "Sledované týmy",
+    "noTeamsYet": "Zatím nesledujete žádné týmy — tato funkce přijde brzy se systémem sledování.",
+    "saved": "Profil byl aktualizován."
+  }
+}

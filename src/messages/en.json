@@ -1,0 +1,47 @@
+{
+  "common": {
+    "appName": "TeamPulse",
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "save": "Save changes",
+    "saving": "Saving…"
+  },
+  "nav": {
+    "myTeams": "My Teams",
+    "settings": "Settings",
+    "login": "Log in",
+    "register": "Register",
+    "logout": "Log out"
+  },
+  "auth": {
+    "loginTitle": "Log in to TeamPulse",
+    "registerTitle": "Create your TeamPulse account",
+    "email": "Email",
+    "password": "Password",
+    "displayName": "Display name",
+    "loginButton": "Log in",
+    "registerButton": "Create account",
+    "orContinueWith": "or continue with",
+    "continueWithGoogle": "Continue with Google",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "signUp": "Sign up",
+    "signIn": "Log in",
+    "invalidCredentials": "Invalid email or password.",
+    "emailInUse": "An account with this email already exists.",
+    "genericError": "Something went wrong. Please try again."
+  },
+  "profile": {
+    "title": "Profile settings",
+    "displayName": "Display name",
+    "language": "Language",
+    "avatar": "Avatar",
+    "uploadAvatar": "Upload photo",
+    "notifications": "Notification preferences",
+    "emailNotifications": "Email notifications",
+    "pushNotifications": "Push notifications",
+    "myTeams": "Followed teams",
+    "noTeamsYet": "You're not following any teams yet — this is coming soon with the Follow System.",
+    "saved": "Profile updated."
+  }
+}

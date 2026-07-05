@@ -1,0 +1,71 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // --- Implemented this phase ---
+
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    // --- Reserved for later phases ---
+    // Rules below are permissive placeholders (any signed-in user may
+    // read/write) so the collections are usable in development, but they do
+    // NOT reflect final access control. Each is annotated with the phase
+    // that will replace it with real rules — see APP_DESIGN.md / CLAUDE.md
+    // phase roadmap.
+
+    // TODO Phase "Team Management": restrict writes to team admins only
+    // (an admins subcollection or admin UID list on the team doc).
+    match /teams/{teamId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // TODO Phase "Seasons & Actions": writes restricted to admins of the
+    // parent team.
+    match /seasons/{seasonId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // TODO Phase "Seasons & Actions": writes restricted to admins of the
+    // parent team; squad assignment restricted similarly.
+    match /actions/{actionId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // TODO Phase "Team Management": enforce youth privacy (SRS §8) —
+    // real name / birthdate / unrestricted avatar readable by team admins
+    // only; public reads must be filtered to pseudonym + no photo for
+    // youth players. This requires field-level rules or a denormalized
+    // "public" view document, not a single blanket rule.
+    match /players/{playerId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // TODO Phase "Comments/Media/Reactions": writes require the author to
+    // match request.auth.uid; deletes/pins restricted to team admins;
+    // moderation-removed content hidden from non-moderators.
+    match /comments/{commentId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // TODO Phase "Comments/Media/Reactions": upload metadata written by
+    // admins only; actual bytes governed by storage.rules.
+    match /media/{mediaId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // TODO Phase "Moderation": create allowed by any signed-in user,
+    // read/update/delete restricted to platform moderators only.
+    match /reports/{reportId} {
+      allow read, write: if isSignedIn();
+    }
+  }
+}

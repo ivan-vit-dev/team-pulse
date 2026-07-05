@@ -1,0 +1,34 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // --- Implemented this phase ---
+
+    // User avatars: owner can upload/replace their own, anyone signed in
+    // can view (avatars are shown across the app — team rosters, comments).
+    match /avatars/{uid}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == uid
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // --- Reserved for later phases ---
+
+    // TODO Phase "Team Management": team logos, writable by team admins only.
+    match /teams/{teamId}/{fileName} {
+      allow read, write: if isSignedIn();
+    }
+
+    // TODO Phase "Comments/Media/Reactions": action media, writable by team
+    // admins only; youth-privacy rules may restrict player photos entirely.
+    match /actions/{actionId}/{fileName} {
+      allow read, write: if isSignedIn();
+    }
+  }
+}
