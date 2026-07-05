@@ -18,11 +18,35 @@ service firebase.storage {
                    && request.resource.contentType.matches('image/.*');
     }
 
-    // --- Reserved for later phases ---
+    function isTeamAdmin(teamId) {
+      return isSignedIn() &&
+        request.auth.uid in
+          firestore.get(/databases/(default)/documents/teams/$(teamId)).data.adminUids;
+    }
 
-    // TODO Phase "Team Management": team logos, writable by team admins only.
+    // Team logos — admin-only write, public read.
     match /teams/{teamId}/{fileName} {
-      allow read, write: if isSignedIn();
+      allow read: if true;
+      allow write: if isTeamAdmin(teamId)
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // Player avatars — admin-of-parent-team-only write, public read. Note:
+    // the app never sets a youth player's avatarURL in Firestore even if a
+    // file exists here (see src/lib/players/player-repository.ts), so a
+    // youth photo is never linked from any public view — but the file
+    // itself isn't blocked at the storage layer beyond requiring the
+    // uploader to be a team admin.
+    match /players/{playerId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() &&
+        request.auth.uid in
+          firestore.get(
+            /databases/(default)/documents/teams/$(
+              firestore.get(/databases/(default)/documents/players/$(playerId)).data.teamId
+            )
+          ).data.adminUids;
     }
 
     // TODO Phase "Comments/Media/Reactions": action media, writable by team

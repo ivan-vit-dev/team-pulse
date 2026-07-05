@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { Link } from "@/i18n/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -16,12 +17,13 @@ export async function Navbar() {
       </Link>
       <div className="flex items-center gap-3">
         <LocaleSwitcher />
+        <ThemeToggle />
         {user ? (
           <>
             <Button
               variant="ghost"
               size="sm"
-              render={<Link href="/settings">{t("myTeams")}</Link>}
+              render={<Link href="/teams">{t("myTeams")}</Link>}
             />
             <UserMenu displayName={user.displayName} photoURL={user.photoURL} />
           </>

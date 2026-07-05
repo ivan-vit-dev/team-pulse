@@ -63,3 +63,8 @@ http://localhost:4000.
 Only the Foundation + Auth phase is implemented. See the **Phase Roadmap** in
 [CLAUDE.md](./CLAUDE.md) for what's next (Team Management, Seasons & Actions, Timeline, Follow
 System, Comments/Media, Notifications, Moderation) — don't assume those features exist yet.
+
+
+Test User:
+test1@example.com
+12345678

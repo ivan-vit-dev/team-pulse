@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
@@ -48,15 +49,18 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       className={`${fontSans.variable} ${fontDisplay.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider>
-          <AuthProvider>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <Toaster />
-          </AuthProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <Toaster />
+            </AuthProvider>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

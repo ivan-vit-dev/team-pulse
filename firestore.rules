@@ -7,6 +7,12 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isTeamAdmin(teamId) {
+      return isSignedIn() &&
+        request.auth.uid in
+          get(/databases/$(database)/documents/teams/$(teamId)).data.adminUids;
+    }
+
     // --- Implemented this phase ---
 
     match /users/{uid} {
@@ -15,18 +21,60 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Note: this app's Team/Player/Invite mutations all go through Server
+    // Actions using firebase-admin (which bypasses these rules) — see
+    // src/lib/teams/, src/lib/players/. These rules are defense-in-depth
+    // for any future direct client reads/writes (e.g. real-time listeners).
+    match /teams/{teamId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.auth.uid in request.resource.data.adminUids
+        && request.resource.data.createdBy == request.auth.uid;
+      allow update: if isTeamAdmin(teamId);
+      allow delete: if false;
+    }
+
+    // Public-safe player fields only — see PlayerPublic in
+    // src/lib/types/player.ts. Real name/birthdate live in the private/
+    // subcollection below, never here (Firestore has no field-level read
+    // security, so anything on this doc is as readable as the doc itself).
+    match /players/{playerId} {
+      allow read: if true;
+      allow create: if isTeamAdmin(request.resource.data.teamId)
+        && (request.resource.data.isYouth == false
+            || request.resource.data.avatarURL == null);
+      allow update: if isTeamAdmin(resource.data.teamId)
+        && (request.resource.data.isYouth == false
+            || request.resource.data.avatarURL == null);
+      allow delete: if isTeamAdmin(resource.data.teamId);
+
+      // SRS §8: real name / birthdate — admins of the parent team only.
+      match /private/{document=**} {
+        allow read, write: if isTeamAdmin(
+          get(/databases/$(database)/documents/players/$(playerId)).data.teamId
+        );
+      }
+    }
+
+    // Accept/decline is done via Server Action (acceptInvite/declineInvite)
+    // so the invite-status update and adminUids update stay atomic and
+    // authorized in one place, rather than trusting two separate client
+    // writes to agree.
+    match /teamAdminInvites/{inviteId} {
+      allow read: if isSignedIn() && (
+        isTeamAdmin(resource.data.teamId) ||
+        resource.data.invitedEmail == request.auth.token.email
+      );
+      allow create: if isTeamAdmin(request.resource.data.teamId);
+      allow update, delete: if isTeamAdmin(resource.data.teamId);
+    }
+
     // --- Reserved for later phases ---
     // Rules below are permissive placeholders (any signed-in user may
     // read/write) so the collections are usable in development, but they do
     // NOT reflect final access control. Each is annotated with the phase
     // that will replace it with real rules — see APP_DESIGN.md / CLAUDE.md
     // phase roadmap.
-
-    // TODO Phase "Team Management": restrict writes to team admins only
-    // (an admins subcollection or admin UID list on the team doc).
-    match /teams/{teamId} {
-      allow read, write: if isSignedIn();
-    }
 
     // TODO Phase "Seasons & Actions": writes restricted to admins of the
     // parent team.
@@ -37,15 +85,6 @@ service cloud.firestore {
     // TODO Phase "Seasons & Actions": writes restricted to admins of the
     // parent team; squad assignment restricted similarly.
     match /actions/{actionId} {
-      allow read, write: if isSignedIn();
-    }
-
-    // TODO Phase "Team Management": enforce youth privacy (SRS §8) —
-    // real name / birthdate / unrestricted avatar readable by team admins
-    // only; public reads must be filtered to pseudonym + no photo for
-    // youth players. This requires field-level rules or a denormalized
-    // "public" view document, not a single blanket rule.
-    match /players/{playerId} {
       allow read, write: if isSignedIn();
     }
 

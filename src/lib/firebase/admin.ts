@@ -4,6 +4,22 @@ import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
+import { useFirebaseEmulators } from "@/lib/firebase/config";
+
+// The Admin SDK's underlying Firestore/Auth clients auto-detect
+// FIRESTORE_EMULATOR_HOST / FIREBASE_AUTH_EMULATOR_HOST / etc.
+// unconditionally — a Google Cloud client library convention that ignores
+// our own useFirebaseEmulators flag entirely. If those vars are left over
+// in .env.local from a previous emulator session, every Admin SDK call
+// would silently redirect to a (likely unreachable) local emulator instead
+// of the real project. Clearing them here makes useFirebaseEmulators the
+// single source of truth regardless of what's left in the environment.
+if (!useFirebaseEmulators) {
+  delete process.env.FIRESTORE_EMULATOR_HOST;
+  delete process.env.FIREBASE_AUTH_EMULATOR_HOST;
+  delete process.env.FIREBASE_STORAGE_EMULATOR_HOST;
+}
+
 function buildAdminApp(): App {
   if (getApps().length) {
     return getApps()[0]!;

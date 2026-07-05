@@ -51,6 +51,7 @@ export function UserMenu({ displayName, photoURL }: UserMenuProps) {
         }
       />
       <DropdownMenuContent align="end">
+        <DropdownMenuItem render={<Link href="/invites">{t("invites")}</Link>} />
         <DropdownMenuItem render={<Link href="/settings">{t("settings")}</Link>} />
         <DropdownMenuItem onClick={handleLogout}>{t("logout")}</DropdownMenuItem>
       </DropdownMenuContent>

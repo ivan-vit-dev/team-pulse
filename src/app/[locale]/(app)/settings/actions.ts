@@ -2,16 +2,8 @@
 
 import { z } from "zod";
 
-import { getVerifiedUid } from "@/lib/auth/session";
+import { requireUid } from "@/lib/auth/require-uid";
 import { updateUserProfile } from "@/lib/users/user-repository";
-
-async function requireUid(): Promise<string> {
-  const uid = await getVerifiedUid();
-  if (!uid) {
-    throw new Error("Not authenticated");
-  }
-  return uid;
-}
 
 const profileSchema = z.object({
   displayName: z.string().min(2),

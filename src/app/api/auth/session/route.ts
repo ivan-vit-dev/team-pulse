@@ -15,6 +15,7 @@ export const runtime = "nodejs";
 const requestSchema = z.object({
   idToken: z.string().min(1),
   locale: z.enum(["en", "cs"]).default("en"),
+  displayName: z.string().min(1).optional(),
 });
 
 export async function POST(request: Request) {
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { idToken, locale } = parsed.data;
+  const { idToken, locale, displayName } = parsed.data;
 
   let decodedToken;
   try {
@@ -36,7 +37,12 @@ export async function POST(request: Request) {
   await ensureUserProfile({
     uid: decodedToken.uid,
     email: decodedToken.email ?? null,
-    displayName: decodedToken.name ?? decodedToken.email?.split("@")[0] ?? "New user",
+    // Prefer the value the client just submitted (e.g. the registration
+    // form's Display Name field) over the ID token's `name` claim: that
+    // claim is baked in when the token is minted and won't reflect a
+    // same-request updateProfile() call. Only used on first profile
+    // creation anyway — ensureUserProfile leaves existing profiles alone.
+    displayName: displayName ?? decodedToken.name ?? decodedToken.email?.split("@")[0] ?? "New user",
     photoURL: decodedToken.picture ?? null,
     locale,
   });

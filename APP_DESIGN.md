@@ -498,7 +498,10 @@ Active namespaces (this phase): `common`, `nav`, `auth`, `profile`. Reserved for
 | App layout components (Navbar, Footer, LocaleSwitcher) | `src/components/layout/` |
 | Auth components (forms, provider) | `src/components/auth/` |
 | Profile components | `src/components/profile/` |
-| Action-type badge, youth-privacy badge (reserved) | `src/components/actions/`, `src/components/players/` |
+| Team CRUD/admin/logo/invite components | `src/components/teams/` |
+| Player form/roster/avatar/youth-privacy-badge components | `src/components/players/` |
+| Team/player/invite Firestore CRUD | `src/lib/teams/`, `src/lib/players/` |
+| Action-type badge (reserved for Seasons & Actions phase) | `src/components/actions/` |
 | next-intl + auth-cookie middleware | `src/proxy.ts` |
 | Locale/message config | `src/i18n/config.ts`, `src/i18n/request.ts`, `src/messages/` |
 | Firestore security rules | `firestore.rules` |

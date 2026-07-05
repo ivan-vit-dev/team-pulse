@@ -13,8 +13,9 @@ privacy protections (pseudonym, no photo, no personal info in public views). Ful
 are in the original SRS the client provided (not checked into this repo) — this file and
 [APP_DESIGN.md](./APP_DESIGN.md) are the living reference going forward.
 
-**Only the Foundation + Auth phase is implemented so far** (see Phase Roadmap below). Don't
-assume team/season/action/follow/comment/notification/moderation features exist in code yet.
+**Only Foundation + Auth and Team Management are implemented so far** (see Phase Roadmap below).
+Don't assume season/action/timeline/follow/comment/notification/moderation features exist in
+code yet.
 
 ## Tech stack
 
@@ -56,6 +57,29 @@ on emulator env vars.
 next-intl's locale middleware with the auth-cookie check in one exported function (Next.js only
 allows one middleware/proxy export).
 
+**All Team/Player/Invite mutations go through Server Actions using the Admin SDK**, the same
+pattern as Foundation + Auth — client code never writes to Firestore directly for these
+collections (the only direct client Firestore/Storage use anywhere in the app is Storage
+uploads for avatars/logos/photos). `firestore.rules`/`storage.rules` still encode the intended
+access model for defense-in-depth (and so a future real-time-listener feature isn't wide open),
+but authorization is enforced in TypeScript first. See `requireTeamAdmin()` in
+`src/app/[locale]/(app)/teams/[teamId]/admin/actions.ts`.
+
+**Youth privacy is a document-boundary, not a field-boundary.** Firestore has no field-level read
+security — if a document is readable, every field on it is readable. So each player is split into
+`players/{playerId}` (public: displayName/pseudonym, jerseyNumber, isYouth, avatarURL — always
+world-readable) and `players/{playerId}/private/profile` (realName, birthdate — admin-of-team
+only). `isYouth` is computed server-side from `birthdate` in `src/lib/players/youth.ts`
+(`YOUTH_AGE_THRESHOLD = 18`, a placeholder for future Remote Config) and re-checked on every
+write in `src/lib/players/player-repository.ts`, which forces `avatarURL` to `null` whenever
+`isYouth` is true — regardless of what the client sends.
+
+**Admin invite accept/decline is a Server Action, not a direct client Firestore write** — it
+needs to atomically flip the invite's status *and* add the accepting user's uid to the team's
+`adminUids`, and the invited user isn't a team admin yet (so they couldn't pass `isTeamAdmin()`
+rules-side anyway). `src/lib/teams/admin-invite-repository.ts` re-verifies the invite's
+`invitedEmail` matches the caller's own verified email before doing either write.
+
 ## Repo structure
 
 ```
@@ -65,9 +89,11 @@ src/
   messages/                en.json, cs.json message catalogs
   lib/
     firebase/              client.ts (browser SDK), admin.ts (server-only Admin SDK)
-    auth/                  session.ts (cookie helpers, getCurrentUser), client-actions.ts
+    auth/                  session.ts, require-uid.ts, client-actions.ts
     users/                 user-repository.ts (Firestore CRUD for users/{uid})
-    types/                 domain TypeScript types (user.ts so far)
+    teams/                 team-repository.ts, admin-invite-repository.ts
+    players/               player-repository.ts (public/private split), youth.ts (age threshold)
+    types/                 domain TypeScript types (user.ts, team.ts, player.ts)
     utils/                 cn.ts, firebase-errors.ts
   hooks/useAuth.ts          consumes AuthProvider's client-side auth state (UX only)
   components/
@@ -75,34 +101,61 @@ src/
     auth/                  AuthProvider, LoginForm, RegisterForm, GoogleSignInButton
     layout/                Navbar, Footer, LocaleSwitcher, UserMenu
     profile/                ProfileForm, AvatarUploader, NotificationPrefsForm, FollowedTeamsList
+    teams/                 CreateTeamForm, EditTeamForm, TeamLogoUploader, AdminList,
+                            InviteAdminForm, PendingInvitesList, InvitesList
+    players/               PlayerForm, PlayerAvatarUploader, PlayerAdminList, RosterGrid,
+                            YouthPrivacyBadge
   app/
     api/auth/session/route.ts   session cookie mint/clear (Node runtime)
     [locale]/
       layout.tsx           fonts, NextIntlClientProvider, AuthProvider, Navbar/Footer, root <html>
       page.tsx             landing page
+      teams/[teamId]/      PUBLIC team page (info + roster) — no auth required
       (auth)/              login/register — redirects away if already signed in
-      (app)/               protected — redirects to /login if not signed in; settings page lives here
+      (app)/               protected — redirects to /login if not signed in
+        settings/          profile settings page + actions.ts
+        teams/             "my teams" (admin) list, actions.ts (createTeamAction)
+          new/              create-team page
+          [teamId]/admin/   admin dashboard + actions.ts (team/admin/player mutations)
+            players/new, players/[playerId]/edit
+        invites/           pending admin-invite accept/decline + actions.ts
 ```
+
+Note the two different `teams/[teamId]` routes at different levels: the **public** team page
+lives directly under `[locale]/teams/[teamId]/` (outside `(app)`, so logged-out fans can view a
+team), while the **admin** dashboard lives under `[locale]/(app)/teams/[teamId]/admin/` (inside
+the protected group). Route groups don't add URL segments, so both contribute to the same
+`/teams/...` URL space without colliding — this is intentional, not an accident.
 
 ## Firestore collections
 
-- `users/{uid}` — **implemented**. See `src/lib/types/user.ts` for the shape.
-- `teams`, `seasons`, `actions`, `players`, `comments`, `media`, `reports` — **reserved**.
-  `firestore.rules` has permissive placeholder rules for each with a `// TODO Phase "...":`
-  comment naming the real access-control rule that phase will add. Don't tighten these ad hoc
-  without also implementing the corresponding feature — check the roadmap below first.
+- `users/{uid}` — **implemented**. See `src/lib/types/user.ts`.
+- `teams/{teamId}` — **implemented**. `adminUids: string[]` gates all writes; see
+  `src/lib/types/team.ts`.
+- `teamAdminInvites/{inviteId}` — **implemented**. Pending/accepted/declined invites, matched to
+  a user by email (not uid) since the invited person may not have an account yet.
+- `players/{playerId}` (public fields) + `players/{playerId}/private/profile` (admin-only real
+  name/birthdate) — **implemented**. See "Youth privacy" below — this split is load-bearing, not
+  a style choice.
+- `seasons`, `actions`, `comments`, `media`, `reports` — **reserved**. `firestore.rules` has
+  permissive placeholder rules for each with a `// TODO Phase "...":` comment naming the real
+  access-control rule that phase will add. Don't tighten these ad hoc without also implementing
+  the corresponding feature — check the roadmap below first.
 
-## Youth privacy (SRS §8 — not yet implemented, but must inform future work)
+## Youth privacy (SRS §8 — implemented for Players; must inform all future work too)
 
-Youth players (under a configurable age threshold) must show a pseudonym only, no photo, and no
-personal info in any public-facing view; real name/birthdate/unrestricted avatar are visible to
-team admins only. Any future Player/Comment/Media/Timeline work must design for this from the
-start — see `YouthPrivacyBadge` in APP_DESIGN.md for the UI convention to reuse.
+Youth players (under `YOUTH_AGE_THRESHOLD` in `src/lib/players/youth.ts`, currently a constant
+18) show a pseudonym only, no photo, and no personal info in any public-facing view; real
+name/birthdate/unrestricted avatar are visible to team admins only. Implemented via the
+public/private document split described above — see `YouthPrivacyBadge` in
+`src/components/players/` (also documented in APP_DESIGN.md) for the UI convention to reuse.
+Any future Comment/Media/Timeline work that surfaces a player must reuse `PlayerPublic`
+(`src/lib/types/player.ts`), never re-derive a "safe" view ad hoc.
 
-## Phase Roadmap (not yet built, in MVP priority order)
+## Phase Roadmap (MVP priority order)
 
-1. **Team Management** — admin creates/edits teams, players, youth privacy fields
-2. **Seasons & Actions** — matches/trainings/tournaments content model
+1. ~~**Team Management**~~ — done: teams, admin invites, players with youth privacy
+2. **Seasons & Actions** — matches/trainings/tournaments content model (next up)
 3. **Timeline** — fan-facing season view aggregating actions (the app's signature surface)
 4. **Follow System** — real `followedTeamIds`, personalized timeline (currently always `[]`)
 5. **Comments/Media/Reactions** — engagement layer, needs youth-privacy-aware moderation hooks
