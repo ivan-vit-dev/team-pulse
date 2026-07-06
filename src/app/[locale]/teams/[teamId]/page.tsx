@@ -35,11 +35,12 @@ export default async function TeamPage({
     notFound();
   }
 
-  const [players, user, t, tl, seasons] = await Promise.all([
+  const [players, user, t, tl, ta, seasons] = await Promise.all([
     listPlayersForTeam(teamId),
     getCurrentUser(),
     getTranslations("teams"),
     getTranslations("timeline"),
+    getTranslations("actions"),
     listSeasonsForTeam(teamId),
   ]);
 
@@ -128,7 +129,14 @@ export default async function TeamPage({
             {nextAction && (
               <div className="space-y-2">
                 <h2 className="font-display text-lg font-bold">{tl("next")}</h2>
-                <ActionCard action={omit(nextAction, "createdAt", "updatedAt")} players={clientPlayers} variant="next" />
+                <ActionCard
+                  action={omit(nextAction, "createdAt", "updatedAt")}
+                  players={clientPlayers}
+                  variant="next"
+                  teamId={teamId}
+                  currentUid={user?.uid ?? null}
+                  commentsLabel={ta("viewComments")}
+                />
               </div>
             )}
 
@@ -136,12 +144,14 @@ export default async function TeamPage({
               <div className="space-y-2">
                 <h2 className="font-display text-lg font-bold">{tl("pastResults")}</h2>
                 <PastActionsFeed
+                  teamId={teamId}
                   seasonId={selectedSeason.id}
                   players={clientPlayers}
                   initialActions={pastActionsPage.actions.map((action) =>
                     omit(action, "createdAt", "updatedAt"),
                   )}
                   initialCursor={pastActionsPage.nextCursor}
+                  currentUid={user?.uid ?? null}
                 />
               </div>
             )}
@@ -150,8 +160,10 @@ export default async function TeamPage({
               <div className="space-y-2">
                 <h2 className="font-display text-lg font-bold">{tl("upcoming")}</h2>
                 <UpcomingActionsList
+                  teamId={teamId}
                   actions={laterUpcomingActions.map((action) => omit(action, "createdAt", "updatedAt"))}
                   players={clientPlayers}
+                  currentUid={user?.uid ?? null}
                 />
               </div>
             )}

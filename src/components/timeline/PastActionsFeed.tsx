@@ -12,19 +12,24 @@ import type { Action } from "@/lib/types/action";
 type ClientSafeAction = Omit<Action, "createdAt" | "updatedAt">;
 
 interface PastActionsFeedProps {
+  teamId: string;
   seasonId: string;
   players: ClientSafePlayer[];
   initialActions: ClientSafeAction[];
   initialCursor: ActionPageCursor | null;
+  currentUid: string | null;
 }
 
 export function PastActionsFeed({
+  teamId,
   seasonId,
   players,
   initialActions,
   initialCursor,
+  currentUid,
 }: PastActionsFeedProps) {
   const t = useTranslations("timeline");
+  const ta = useTranslations("actions");
   const [actions, setActions] = useState(initialActions);
   const [cursor, setCursor] = useState(initialCursor);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +62,15 @@ export function PastActionsFeed({
   return (
     <div className="space-y-3">
       {actions.map((action) => (
-        <ActionCard key={action.id} action={action} players={players} variant="past" />
+        <ActionCard
+          key={action.id}
+          action={action}
+          players={players}
+          variant="past"
+          teamId={teamId}
+          currentUid={currentUid}
+          commentsLabel={ta("viewComments")}
+        />
       ))}
       {cursor ? (
         <div ref={sentinelRef} className="py-2 text-center text-sm text-muted-foreground">

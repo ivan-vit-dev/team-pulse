@@ -164,7 +164,10 @@
     "confirmDeleteTitle": "Remove this action?",
     "confirmDeleteDescription": "This action cannot be undone.",
     "created": "Action created.",
-    "updated": "Action updated."
+    "updated": "Action updated.",
+    "like": "Like",
+    "unlike": "Unlike",
+    "viewComments": "Comments"
   },
   "timeline": {
     "next": "Next",
@@ -180,5 +183,25 @@
     "noFollowedTeams": "You're not following any teams yet.",
     "discoverTeams": "Discover teams",
     "noUpcomingActions": "No upcoming actions."
+  },
+  "comments": {
+    "title": "Comments",
+    "placeholder": "Write a comment…",
+    "post": "Post",
+    "noCommentsYet": "No comments yet.",
+    "delete": "Delete",
+    "confirmDeleteTitle": "Delete this comment?",
+    "confirmDeleteDescription": "This action cannot be undone.",
+    "pin": "Pin comment",
+    "unpin": "Unpin comment",
+    "loginToComment": "Log in to leave a comment."
+  },
+  "media": {
+    "title": "Photos",
+    "upload": "Upload photo",
+    "noMediaYet": "No photos yet.",
+    "delete": "Delete",
+    "confirmDeleteTitle": "Delete this photo?",
+    "confirmDeleteDescription": "This action cannot be undone."
   }
 }

@@ -10,10 +10,11 @@ import { getTeamsByIds } from "@/lib/teams/team-repository";
 import { omit } from "@/lib/utils/omit";
 
 export default async function LandingPage() {
-  const [user, t, th] = await Promise.all([
+  const [user, t, th, ta] = await Promise.all([
     getCurrentUser(),
     getTranslations("auth"),
     getTranslations("home"),
+    getTranslations("actions"),
   ]);
 
   if (user) {
@@ -40,7 +41,12 @@ export default async function LandingPage() {
             <Button className="gradient-brand" render={<Link href="/teams">{th("discoverTeams")}</Link>} />
           </div>
         ) : (
-          <FollowedTeamsFeed entries={entries} noUpcomingActionsLabel={th("noUpcomingActions")} />
+          <FollowedTeamsFeed
+            entries={entries}
+            noUpcomingActionsLabel={th("noUpcomingActions")}
+            commentsLabel={ta("viewComments")}
+            currentUid={user.uid}
+          />
         )}
       </div>
     );

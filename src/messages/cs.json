@@ -164,7 +164,10 @@
     "confirmDeleteTitle": "Odebrat tuto akci?",
     "confirmDeleteDescription": "Tuto akci nelze vrátit zpět.",
     "created": "Akce byla vytvořena.",
-    "updated": "Akce byla aktualizována."
+    "updated": "Akce byla aktualizována.",
+    "like": "Líbí se mi",
+    "unlike": "Nelíbí se mi",
+    "viewComments": "Komentáře"
   },
   "timeline": {
     "next": "Nejbližší",
@@ -180,5 +183,25 @@
     "noFollowedTeams": "Zatím nesledujete žádné týmy.",
     "discoverTeams": "Objevit týmy",
     "noUpcomingActions": "Žádné nadcházející akce."
+  },
+  "comments": {
+    "title": "Komentáře",
+    "placeholder": "Napište komentář…",
+    "post": "Odeslat",
+    "noCommentsYet": "Zatím žádné komentáře.",
+    "delete": "Smazat",
+    "confirmDeleteTitle": "Smazat tento komentář?",
+    "confirmDeleteDescription": "Tuto akci nelze vrátit zpět.",
+    "pin": "Připnout komentář",
+    "unpin": "Odepnout komentář",
+    "loginToComment": "Pro přidání komentáře se prosím přihlaste."
+  },
+  "media": {
+    "title": "Fotky",
+    "upload": "Nahrát fotku",
+    "noMediaYet": "Zatím žádné fotky.",
+    "delete": "Smazat",
+    "confirmDeleteTitle": "Smazat tuto fotku?",
+    "confirmDeleteDescription": "Tuto akci nelze vrátit zpět."
   }
 }

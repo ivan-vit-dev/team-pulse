@@ -14,9 +14,16 @@ export interface FeedEntry {
 interface FollowedTeamsFeedProps {
   entries: FeedEntry[];
   noUpcomingActionsLabel: string;
+  commentsLabel: string;
+  currentUid: string;
 }
 
-export function FollowedTeamsFeed({ entries, noUpcomingActionsLabel }: FollowedTeamsFeedProps) {
+export function FollowedTeamsFeed({
+  entries,
+  noUpcomingActionsLabel,
+  commentsLabel,
+  currentUid,
+}: FollowedTeamsFeedProps) {
   return (
     <div className="w-full max-w-lg space-y-4 text-left">
       {entries.map(({ team, nextAction }) => (
@@ -31,7 +38,14 @@ export function FollowedTeamsFeed({ entries, noUpcomingActionsLabel }: FollowedT
             <span className="font-display font-bold">{team.name}</span>
           </Link>
           {nextAction ? (
-            <ActionCard action={nextAction} players={[]} variant="next" />
+            <ActionCard
+              action={nextAction}
+              players={[]}
+              variant="next"
+              teamId={team.id}
+              currentUid={currentUid}
+              commentsLabel={commentsLabel}
+            />
           ) : (
             <p className="pl-10 text-sm text-muted-foreground">{noUpcomingActionsLabel}</p>
           )}

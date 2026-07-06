@@ -49,10 +49,22 @@ service firebase.storage {
           ).data.adminUids;
     }
 
-    // TODO Phase "Comments/Media/Reactions": action media, writable by team
-    // admins only; youth-privacy rules may restrict player photos entirely.
+    // Action media — admin-of-parent-team-only write, public read. Team
+    // admins only (not open fan uploads) is a deliberate youth-privacy
+    // choice: unlike player avatars, there's no structural way to block a
+    // photo from showing a youth player's face, so uploads are restricted to
+    // already-vetted team admins rather than any signed-in fan.
     match /actions/{actionId}/{fileName} {
-      allow read, write: if isSignedIn();
+      allow read: if true;
+      allow write: if isSignedIn() &&
+        request.auth.uid in
+          firestore.get(
+            /databases/(default)/documents/teams/$(
+              firestore.get(/databases/(default)/documents/actions/$(actionId)).data.teamId
+            )
+          ).data.adminUids
+          && request.resource.size < 5 * 1024 * 1024
+          && request.resource.contentType.matches('image/.*');
     }
   }
 }

@@ -9,6 +9,7 @@ import {
   updateAction as updateActionRepo,
 } from "@/lib/actions/action-repository";
 import { requireUid } from "@/lib/auth/require-uid";
+import { createMedia, deleteMedia, getMedia } from "@/lib/media/media-repository";
 import {
   getPlayerPublic,
   listPlayersForTeam,
@@ -252,4 +253,21 @@ export async function deleteActionAction(actionId: string) {
   if (!action) throw new Error("Action not found");
   await requireTeamAdmin(action.teamId);
   await deleteActionRepo(actionId);
+}
+
+export async function createMediaAction(
+  actionId: string,
+  teamId: string,
+  url: string,
+): Promise<{ mediaId: string }> {
+  const uid = await requireTeamAdmin(teamId);
+  const mediaId = await createMedia(actionId, teamId, uid, url);
+  return { mediaId };
+}
+
+export async function deleteMediaAction(mediaId: string): Promise<void> {
+  const media = await getMedia(mediaId);
+  if (!media) throw new Error("Media not found");
+  await requireTeamAdmin(media.teamId);
+  await deleteMedia(mediaId);
 }

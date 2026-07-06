@@ -37,6 +37,7 @@ export async function createAction(
     teamId,
     seasonId,
     ...input,
+    likedByUids: [],
     createdBy: creatorUid,
   };
   await ref.set({
@@ -114,4 +115,16 @@ export async function updateAction(actionId: string, input: ActionInput): Promis
 
 export async function deleteAction(actionId: string): Promise<void> {
   await actionsCollection.doc(actionId).delete();
+}
+
+export async function likeAction(actionId: string, uid: string): Promise<void> {
+  await actionsCollection.doc(actionId).update({
+    likedByUids: FieldValue.arrayUnion(uid),
+  });
+}
+
+export async function unlikeAction(actionId: string, uid: string): Promise<void> {
+  await actionsCollection.doc(actionId).update({
+    likedByUids: FieldValue.arrayRemove(uid),
+  });
 }

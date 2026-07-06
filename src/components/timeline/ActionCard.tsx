@@ -1,5 +1,7 @@
 import { ActionTypeBadge } from "@/components/actions/ActionTypeBadge";
 import { SquadChips, type ClientSafePlayer } from "@/components/timeline/SquadChips";
+import { LikeButton } from "@/components/timeline/LikeButton";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import type { Action } from "@/lib/types/action";
 
@@ -8,10 +10,20 @@ type ClientSafeAction = Omit<Action, "createdAt" | "updatedAt">;
 interface ActionCardProps {
   action: ClientSafeAction;
   players: ClientSafePlayer[];
-  variant: "next" | "past" | "upcoming";
+  variant: "next" | "past" | "upcoming" | "detail";
+  teamId: string;
+  currentUid: string | null;
+  commentsLabel?: string;
 }
 
-export function ActionCard({ action, players, variant }: ActionCardProps) {
+export function ActionCard({
+  action,
+  players,
+  variant,
+  teamId,
+  currentUid,
+  commentsLabel,
+}: ActionCardProps) {
   return (
     <div
       className={cn(
@@ -39,6 +51,23 @@ export function ActionCard({ action, players, variant }: ActionCardProps) {
         {action.location ? ` · ${action.location}` : ""}
       </p>
       <SquadChips playerIds={action.squadPlayerIds} players={players} />
+      {variant !== "detail" && (
+        <div className="flex items-center gap-2 pt-1">
+          {currentUid && (
+            <LikeButton
+              actionId={action.id}
+              initialIsLiked={action.likedByUids?.includes(currentUid) ?? false}
+              initialCount={action.likedByUids?.length ?? 0}
+            />
+          )}
+          <Link
+            href={`/teams/${teamId}/actions/${action.id}`}
+            className="text-sm text-muted-foreground hover:text-foreground hover:underline"
+          >
+            {commentsLabel}
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

@@ -94,25 +94,34 @@ service cloud.firestore {
       allow update, delete: if isTeamAdmin(resource.data.teamId);
     }
 
+    // Comment/Media mutations also go through Server Actions using
+    // firebase-admin (bypasses these rules) — see src/lib/comments/,
+    // src/lib/media/. Defense-in-depth only, same as every other collection
+    // above. Hard delete by author-or-admin this phase — no moderator role
+    // or soft-delete/audit trail yet; that's Phase "Moderation".
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.authorUid;
+      allow update: if isTeamAdmin(resource.data.teamId);
+      allow delete: if isSignedIn() &&
+        (request.auth.uid == resource.data.authorUid || isTeamAdmin(resource.data.teamId));
+    }
+
+    // Uploads are team-admin only this phase (see storage.rules for the
+    // actual bytes) — a deliberate youth-privacy-motivated choice, not the
+    // open-fan-upload default the "engagement layer" framing might suggest.
+    match /media/{mediaId} {
+      allow read: if true;
+      allow create: if isTeamAdmin(request.resource.data.teamId);
+      allow delete: if isTeamAdmin(resource.data.teamId);
+    }
+
     // --- Reserved for later phases ---
     // Rules below are permissive placeholders (any signed-in user may
     // read/write) so the collections are usable in development, but they do
     // NOT reflect final access control. Each is annotated with the phase
     // that will replace it with real rules — see APP_DESIGN.md / CLAUDE.md
     // phase roadmap.
-
-    // TODO Phase "Comments/Media/Reactions": writes require the author to
-    // match request.auth.uid; deletes/pins restricted to team admins;
-    // moderation-removed content hidden from non-moderators.
-    match /comments/{commentId} {
-      allow read, write: if isSignedIn();
-    }
-
-    // TODO Phase "Comments/Media/Reactions": upload metadata written by
-    // admins only; actual bytes governed by storage.rules.
-    match /media/{mediaId} {
-      allow read, write: if isSignedIn();
-    }
 
     // TODO Phase "Moderation": create allowed by any signed-in user,
     // read/update/delete restricted to platform moderators only.

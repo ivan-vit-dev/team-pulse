@@ -26,6 +26,9 @@ export interface Action {
   /** Subset of the team's player ids called up to this action. */
   squadPlayerIds: string[];
   notes: string | null;
+  /** Uids of users who liked this action. Absent on actions created before
+   * this field existed — always read via `action.likedByUids ?? []`. */
+  likedByUids: string[];
   createdBy: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
