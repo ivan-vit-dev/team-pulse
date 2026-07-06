@@ -18,12 +18,17 @@ export async function Navbar() {
       <div className="flex items-center gap-3">
         <LocaleSwitcher />
         <ThemeToggle />
+        <Button
+          variant="ghost"
+          size="sm"
+          render={<Link href="/teams">{t("discoverTeams")}</Link>}
+        />
         {user ? (
           <>
             <Button
               variant="ghost"
               size="sm"
-              render={<Link href="/teams">{t("myTeams")}</Link>}
+              render={<Link href="/teams/mine">{t("myTeams")}</Link>}
             />
             <UserMenu displayName={user.displayName} photoURL={user.photoURL} />
           </>

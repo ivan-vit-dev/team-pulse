@@ -49,6 +49,18 @@ export async function listTeamsForAdmin(uid: string): Promise<Team[]> {
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Team);
 }
 
+export async function listAllTeams(): Promise<Team[]> {
+  const snapshot = await teamsCollection.get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Team);
+}
+
+// Drops ids for teams that no longer exist (e.g. a followed team was since
+// deleted) rather than failing the whole lookup.
+export async function getTeamsByIds(teamIds: string[]): Promise<Team[]> {
+  const teams = await Promise.all(teamIds.map((id) => getTeam(id)));
+  return teams.filter((team): team is Team => team !== null);
+}
+
 export async function isTeamAdmin(teamId: string, uid: string): Promise<boolean> {
   const team = await getTeam(teamId);
   return team !== null && team.adminUids.includes(uid);

@@ -5,7 +5,10 @@ import {
   PAST_ACTIONS_PAGE_SIZE,
   type ActionPageCursor,
 } from "@/lib/actions/action-repository";
+import { requireUid } from "@/lib/auth/require-uid";
+import { getTeam } from "@/lib/teams/team-repository";
 import type { Action } from "@/lib/types/action";
+import { followTeam, unfollowTeam } from "@/lib/users/user-repository";
 import { omit } from "@/lib/utils/omit";
 
 export interface ClientActionPage {
@@ -29,4 +32,16 @@ export async function loadMorePastActionsAction(
     actions: page.actions.map((action) => omit(action, "createdAt", "updatedAt")),
     nextCursor: page.nextCursor,
   };
+}
+
+export async function followTeamAction(teamId: string): Promise<void> {
+  const uid = await requireUid();
+  const team = await getTeam(teamId);
+  if (!team) throw new Error("Team not found");
+  await followTeam(uid, teamId);
+}
+
+export async function unfollowTeamAction(teamId: string): Promise<void> {
+  const uid = await requireUid();
+  await unfollowTeam(uid, teamId);
 }

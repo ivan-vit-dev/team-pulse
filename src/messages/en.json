@@ -8,6 +8,7 @@
   },
   "nav": {
     "myTeams": "My Teams",
+    "discoverTeams": "Teams",
     "invites": "Invites",
     "settings": "Settings",
     "login": "Log in",
@@ -43,7 +44,7 @@
     "emailNotifications": "Email notifications",
     "pushNotifications": "Push notifications",
     "myTeams": "Followed teams",
-    "noTeamsYet": "You're not following any teams yet — this is coming soon with the Follow System.",
+    "noTeamsYet": "You're not following any teams yet.",
     "saved": "Profile updated."
   },
   "teams": {
@@ -67,6 +68,10 @@
     "instagram": "Instagram",
     "twitter": "Twitter / X",
     "noTeamsYet": "You don't administer any teams yet.",
+    "browseTeams": "Teams",
+    "noTeamsAtAll": "No teams have been created yet.",
+    "follow": "Follow",
+    "following": "Following",
     "adminDashboard": "Admin dashboard",
     "viewTeamPage": "View team page",
     "teamInfo": "Team info",
@@ -169,5 +174,11 @@
     "noActionsYet": "No actions yet.",
     "loadingMore": "Loading more…",
     "noMoreActions": "No more actions."
+  },
+  "home": {
+    "title": "Your feed",
+    "noFollowedTeams": "You're not following any teams yet.",
+    "discoverTeams": "Discover teams",
+    "noUpcomingActions": "No upcoming actions."
   }
 }

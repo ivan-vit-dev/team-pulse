@@ -101,3 +101,17 @@ export async function updateUserProfile(
 
   await ref.set(update, { merge: true });
 }
+
+export async function followTeam(uid: string, teamId: string): Promise<void> {
+  await usersCollection.doc(uid).update({
+    followedTeamIds: FieldValue.arrayUnion(teamId),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}
+
+export async function unfollowTeam(uid: string, teamId: string): Promise<void> {
+  await usersCollection.doc(uid).update({
+    followedTeamIds: FieldValue.arrayRemove(teamId),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}

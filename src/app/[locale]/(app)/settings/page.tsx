@@ -6,6 +6,7 @@ import { NotificationPrefsForm } from "@/components/profile/NotificationPrefsFor
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/auth/session";
+import { getTeamsByIds } from "@/lib/teams/team-repository";
 
 export default async function SettingsPage() {
   const [user, t] = await Promise.all([getCurrentUser(), getTranslations("profile")]);
@@ -15,6 +16,8 @@ export default async function SettingsPage() {
     // just a type-narrowing guard for the render below.
     return null;
   }
+
+  const followedTeams = await getTeamsByIds(user.followedTeamIds);
 
   return (
     <div className="space-y-6">
@@ -49,7 +52,7 @@ export default async function SettingsPage() {
           <h2 className="font-display text-lg font-bold">{t("myTeams")}</h2>
         </CardHeader>
         <CardContent>
-          <FollowedTeamsList teamIds={user.followedTeamIds} />
+          <FollowedTeamsList teams={followedTeams} />
         </CardContent>
       </Card>
     </div>

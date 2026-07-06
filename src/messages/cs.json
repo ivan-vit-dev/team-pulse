@@ -8,6 +8,7 @@
   },
   "nav": {
     "myTeams": "Moje týmy",
+    "discoverTeams": "Týmy",
     "invites": "Pozvánky",
     "settings": "Nastavení",
     "login": "Přihlásit se",
@@ -43,7 +44,7 @@
     "emailNotifications": "E-mailová oznámení",
     "pushNotifications": "Push oznámení",
     "myTeams": "Sledované týmy",
-    "noTeamsYet": "Zatím nesledujete žádné týmy — tato funkce přijde brzy se systémem sledování.",
+    "noTeamsYet": "Zatím nesledujete žádné týmy.",
     "saved": "Profil byl aktualizován."
   },
   "teams": {
@@ -67,6 +68,10 @@
     "instagram": "Instagram",
     "twitter": "Twitter / X",
     "noTeamsYet": "Zatím nespravujete žádný tým.",
+    "browseTeams": "Týmy",
+    "noTeamsAtAll": "Zatím nebyl vytvořen žádný tým.",
+    "follow": "Sledovat",
+    "following": "Sledováno",
     "adminDashboard": "Správa týmu",
     "viewTeamPage": "Zobrazit stránku týmu",
     "teamInfo": "Informace o týmu",
@@ -169,5 +174,11 @@
     "noActionsYet": "Zatím žádné akce.",
     "loadingMore": "Načítání dalších…",
     "noMoreActions": "Žádné další akce."
+  },
+  "home": {
+    "title": "Váš přehled",
+    "noFollowedTeams": "Zatím nesledujete žádné týmy.",
+    "discoverTeams": "Objevit týmy",
+    "noUpcomingActions": "Žádné nadcházející akce."
   }
 }

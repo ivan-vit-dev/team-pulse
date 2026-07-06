@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { RosterGrid } from "@/components/players/RosterGrid";
 import { SeasonSwitcher } from "@/components/seasons/SeasonSwitcher";
+import { FollowButton } from "@/components/teams/FollowButton";
 import { ActionCard } from "@/components/timeline/ActionCard";
 import { PastActionsFeed } from "@/components/timeline/PastActionsFeed";
 import { UpcomingActionsList } from "@/components/timeline/UpcomingActionsList";
@@ -93,9 +94,17 @@ export default async function TeamPage({
             </p>
           </div>
         </div>
-        {isAdmin && (
-          <Button variant="outline" render={<Link href={`/teams/${teamId}/admin`}>{t("adminDashboard")}</Link>} />
-        )}
+        <div className="flex items-center gap-2">
+          {user && (
+            <FollowButton
+              teamId={teamId}
+              initialIsFollowing={user.followedTeamIds.includes(teamId)}
+            />
+          )}
+          {isAdmin && (
+            <Button variant="outline" render={<Link href={`/teams/${teamId}/admin`}>{t("adminDashboard")}</Link>} />
+          )}
+        </div>
       </div>
 
       <div className="space-y-3">
