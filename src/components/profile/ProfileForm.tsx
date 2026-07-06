@@ -83,7 +83,11 @@ export function ProfileForm({ displayName, locale }: ProfileFormProps) {
           }}
         >
           <SelectTrigger id="locale" className="w-full">
-            <SelectValue />
+            {/* Select.Value doesn't auto-resolve a label from the matching
+                SelectItem's children — it needs an explicit render function. */}
+            <SelectValue>
+              {(value: string) => (value === "en" ? "English" : "Čeština")}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="en">English</SelectItem>

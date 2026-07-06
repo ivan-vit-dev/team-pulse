@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,6 +11,7 @@ import { createTeamAction } from "@/app/[locale]/(app)/teams/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRouter } from "@/i18n/navigation";
 
 const hexColor = /^#[0-9a-fA-F]{6}$/;
 
@@ -63,8 +63,11 @@ export function CreateTeamForm() {
         colors: { primary: values.primaryColor, secondary: values.secondaryColor },
       });
       toast.success(t("created"));
+      // No router.refresh() here: calling it immediately after push()
+      // interrupts the in-flight transition (confirmed via live testing) —
+      // push() to a route not yet in the router cache already fetches a
+      // fresh RSC payload for the destination on its own.
       router.push(`/teams/${teamId}/admin`);
-      router.refresh();
     } catch {
       toast.error(ta("genericError"));
     } finally {

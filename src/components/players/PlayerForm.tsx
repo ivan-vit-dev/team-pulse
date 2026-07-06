@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,6 +15,7 @@ import { PlayerAvatarUploader } from "@/components/players/PlayerAvatarUploader"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRouter } from "@/i18n/navigation";
 import { computeIsYouth } from "@/lib/players/youth";
 import type { PlayerWithPrivate } from "@/lib/types/player";
 
@@ -74,8 +74,11 @@ export function PlayerForm({ teamId, player }: PlayerFormProps) {
       } else {
         await createPlayerAction(teamId, input);
       }
+      // No router.refresh() here: calling it immediately after push()
+      // interrupts the in-flight transition (confirmed via live testing) —
+      // push() to a route not yet in the router cache already fetches a
+      // fresh RSC payload for the destination on its own.
       router.push(`/teams/${teamId}/admin`);
-      router.refresh();
     } catch {
       toast.error(ta("genericError"));
     } finally {

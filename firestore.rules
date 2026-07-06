@@ -69,24 +69,37 @@ service cloud.firestore {
       allow update, delete: if isTeamAdmin(resource.data.teamId);
     }
 
+    // Note: like teams/players/invites above, Season/Action mutations all go
+    // through Server Actions using firebase-admin (bypasses these rules) —
+    // see src/lib/seasons/, src/lib/actions/. These rules are defense-in-depth
+    // for any future direct client reads/writes (e.g. real-time listeners).
+    // World-readable to match teams/players — no privacy dimension here
+    // (contrast players/{id}/private).
+    match /seasons/{seasonId} {
+      allow read: if true;
+      allow create: if isTeamAdmin(request.resource.data.teamId);
+      allow update, delete: if isTeamAdmin(resource.data.teamId);
+    }
+
+    // Squad assignment (squadPlayerIds) is validated against the team's
+    // actual roster at the Server Action layer (createActionAction /
+    // updateActionAction in admin/actions.ts), not here — rules have no
+    // cheap way to check that each array entry references a player on this
+    // same team without a get() per entry, and real writes never go through
+    // these rules anyway. A flat isTeamAdmin(teamId) check is the correct
+    // amount of defense-in-depth.
+    match /actions/{actionId} {
+      allow read: if true;
+      allow create: if isTeamAdmin(request.resource.data.teamId);
+      allow update, delete: if isTeamAdmin(resource.data.teamId);
+    }
+
     // --- Reserved for later phases ---
     // Rules below are permissive placeholders (any signed-in user may
     // read/write) so the collections are usable in development, but they do
     // NOT reflect final access control. Each is annotated with the phase
     // that will replace it with real rules — see APP_DESIGN.md / CLAUDE.md
     // phase roadmap.
-
-    // TODO Phase "Seasons & Actions": writes restricted to admins of the
-    // parent team.
-    match /seasons/{seasonId} {
-      allow read, write: if isSignedIn();
-    }
-
-    // TODO Phase "Seasons & Actions": writes restricted to admins of the
-    // parent team; squad assignment restricted similarly.
-    match /actions/{actionId} {
-      allow read, write: if isSignedIn();
-    }
 
     // TODO Phase "Comments/Media/Reactions": writes require the author to
     // match request.auth.uid; deletes/pins restricted to team admins;

@@ -23,8 +23,9 @@ export function UserMenu({ displayName, photoURL }: UserMenuProps) {
 
   async function handleLogout() {
     await signOutClient();
+    // No router.refresh() here: calling it immediately after push()
+    // interrupts the in-flight transition (confirmed via live testing).
     router.push("/");
-    router.refresh();
   }
 
   const initials = displayName
