@@ -21,31 +21,30 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-bold">{t("title")}</h1>
+      <h1 className="font-impact text-4xl uppercase">{t("title")}</h1>
 
-      <Card>
-        <CardHeader>
-          <h2 className="font-display text-lg font-bold">{t("avatar")}</h2>
-        </CardHeader>
-        <CardContent>
-          <AvatarUploader displayName={user.displayName} photoURL={user.photoURL} />
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <h2 className="font-display text-lg font-bold">{t("avatar")}</h2>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <AvatarUploader displayName={user.displayName} photoURL={user.photoURL} />
+            <div className="border-t border-border pt-6">
+              <ProfileForm displayName={user.displayName} locale={user.locale} />
+            </div>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardContent className="pt-6">
-          <ProfileForm displayName={user.displayName} locale={user.locale} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <h2 className="font-display text-lg font-bold">{t("notifications")}</h2>
-        </CardHeader>
-        <CardContent>
-          <NotificationPrefsForm preferences={user.notificationPreferences} />
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <h2 className="font-display text-lg font-bold">{t("notifications")}</h2>
+          </CardHeader>
+          <CardContent>
+            <NotificationPrefsForm preferences={user.notificationPreferences} />
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader>

@@ -48,3 +48,8 @@ firestore-debug.log
 ui-debug.log
 pubsub-debug.log
 storage-debug.log
+
+# cloud functions (separate TypeScript project, its own deps/build output)
+functions/node_modules
+functions/lib
+functions/*.tsbuildinfo

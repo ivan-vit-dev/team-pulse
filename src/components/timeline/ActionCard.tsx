@@ -14,6 +14,7 @@ interface ActionCardProps {
   teamId: string;
   currentUid: string | null;
   commentsLabel?: string;
+  nextLabel?: string;
 }
 
 export function ActionCard({
@@ -23,12 +24,13 @@ export function ActionCard({
   teamId,
   currentUid,
   commentsLabel,
+  nextLabel,
 }: ActionCardProps) {
   return (
     <div
       className={cn(
-        "animate-timeline-in space-y-2 rounded-lg border border-border p-4",
-        variant === "next" && "animate-pulse-next",
+        "animate-timeline-in relative space-y-2 rounded-xl border border-border bg-card p-4",
+        variant === "next" && "animate-pulse-next overflow-hidden",
       )}
       style={{
         boxShadow: variant === "next" ? "var(--timeline-next-ring)" : undefined,
@@ -36,15 +38,42 @@ export function ActionCard({
         filter: variant === "upcoming" ? "var(--timeline-upcoming-filter)" : undefined,
       }}
     >
+      {variant === "next" && (
+        <>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-[1]"
+            style={{
+              background:
+                "radial-gradient(120% 140% at 0% 0%, color-mix(in oklch, var(--floodlight) 16%, transparent), transparent 60%)",
+            }}
+          />
+          {nextLabel && (
+            <span
+              className="font-display text-xs font-bold uppercase tracking-wider"
+              style={{ color: "var(--floodlight)" }}
+            >
+              {nextLabel}
+            </span>
+          )}
+        </>
+      )}
+      {variant === "past" && (
+        <>
+          <span className="ticket-notch -left-[9px] top-[26px]" />
+          <span className="ticket-notch -right-[9px] top-[26px]" />
+        </>
+      )}
       <div className="flex items-center gap-2">
         <ActionTypeBadge type={action.type} />
         <span className="font-display font-bold">{action.title}</span>
         {action.result && (
-          <span className="font-display font-bold">
-            {action.result.ourScore} : {action.result.theirScore}
+          <span className="font-impact text-lg">
+            {action.result.ourScore}&thinsp;:&thinsp;{action.result.theirScore}
           </span>
         )}
       </div>
+      {variant === "past" && <div className="ticket-seam" />}
       <p className="font-display text-sm text-muted-foreground">
         {action.date}
         {action.time ? ` · ${action.time}` : ""}

@@ -7,6 +7,7 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { getMessaging, isSupported, type Messaging } from "firebase/messaging";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
 
 import { firebaseClientConfig, useFirebaseEmulators } from "./config";
@@ -30,4 +31,16 @@ if (useFirebaseEmulators && !globalThis.__teamPulseEmulatorsConnected) {
   connectFirestoreEmulator(firestore, "127.0.0.1", 8080);
   connectStorageEmulator(storage, "127.0.0.1", 9199);
   globalThis.__teamPulseEmulatorsConnected = true;
+}
+
+// Unlike auth/firestore/storage, messaging can throw in environments that
+// don't support it (Safari, non-HTTPS, no service worker support) — so it's
+// a lazy, guarded getter rather than an eager module-level export.
+let messagingInstance: Messaging | null | undefined;
+
+export async function getFcmMessaging(): Promise<Messaging | null> {
+  if (typeof window === "undefined") return null;
+  if (messagingInstance !== undefined) return messagingInstance;
+  messagingInstance = (await isSupported()) ? getMessaging(app) : null;
+  return messagingInstance;
 }

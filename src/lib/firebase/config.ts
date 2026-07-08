@@ -38,3 +38,7 @@ export const firebaseClientConfig = {
 
 export const useFirebaseEmulators =
   process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true";
+
+// Optional, unlike the config above: push notifications are opt-in, so a
+// user who hasn't set this up yet shouldn't break the rest of the app.
+export const firebaseVapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;

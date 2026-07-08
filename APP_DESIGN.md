@@ -7,9 +7,11 @@ timeline conventions. Update this when adding new reusable UI patterns.
 
 ## Color System
 
-**Pitch Green / Kit Navy palette** — hue 152 (fresh pitch green) paired with hue 250 (kit navy
-blue). Distinct from any amber/gold or violet palette used in other projects — don't reuse those
-hues here.
+**"Matchday, under lights"** — a deeper, more saturated pitch green (hue 152) paired with a
+richer kit navy (hue 250) and a new warm sodium-floodlight gold accent (hue 75). The floodlight
+tone is dusk-kickoff energy, not a generic amber/warning color — it's reserved for glow effects,
+the timeline's "next" ring, and hero eyebrows. Distinct from any violet palette used in other
+projects — don't reuse those hues here.
 
 All colors use `oklch()` values. **Do not use opacity modifiers** (`bg-primary/50`) — they break
 with CSS variable-based tokens. Use `color-mix()` instead:
@@ -25,13 +27,13 @@ background: color-mix(in oklch, var(--primary) 15%, transparent);
 ### Light mode tokens (`:root`)
 
 ```css
---background:           oklch(0.98 0.004 152);   /* near-white, cool tint */
---foreground:           oklch(0.14 0.02 250);    /* near-black, navy-tinted */
+--background:           oklch(0.975 0.006 95);  /* warm chalk white */
+--foreground:           oklch(0.16 0.02 250);    /* near-black, navy-tinted */
 --card:                 oklch(1 0 0);
---card-foreground:      oklch(0.14 0.02 250);
+--card-foreground:      oklch(0.16 0.02 250);
 --popover:              oklch(1 0 0);
---popover-foreground:   oklch(0.14 0.02 250);
---primary:              oklch(0.62 0.15 152);    /* fresh pitch green */
+--popover-foreground:   oklch(0.16 0.02 250);
+--primary:              oklch(0.56 0.17 152);    /* deep turf green */
 --primary-foreground:   oklch(0.99 0.005 152);
 --secondary:            oklch(0.93 0.015 152);
 --secondary-foreground: oklch(0.28 0.05 152);
@@ -39,32 +41,38 @@ background: color-mix(in oklch, var(--primary) 15%, transparent);
 --muted-foreground:     oklch(0.48 0.02 250);
 --accent:               oklch(0.91 0.02 250);
 --accent-foreground:    oklch(0.22 0.06 250);
---brand-accent:         oklch(0.55 0.18 250);    /* kit navy blue */
+--brand-accent:         oklch(0.42 0.15 250);    /* deep kit navy blue */
+--floodlight:           oklch(0.74 0.15 75);     /* sodium floodlight gold */
+--floodlight-foreground: oklch(0.24 0.05 75);
 --destructive:          oklch(0.577 0.245 27);
 --border:               oklch(0.89 0.008 250);
 --input:                oklch(0.89 0.008 250);
---ring:                 oklch(0.62 0.15 152);
+--ring:                 oklch(0.56 0.17 152);
 --radius:               0.75rem;
---shadow-glow:          0 0 24px oklch(0.62 0.15 152 / 0.30);
---shadow-glow-navy:     0 0 24px oklch(0.55 0.18 250 / 0.30);
+--shadow-glow:          0 0 24px oklch(0.56 0.17 152 / 0.30);
+--shadow-glow-navy:     0 0 24px oklch(0.42 0.15 250 / 0.30);
+--shadow-glow-floodlight: 0 0 28px oklch(0.74 0.15 75 / 0.35);
 ```
 
 ### Dark mode tokens (`.dark`)
 
 ```css
---background:           oklch(0.11 0.012 250);
+--background:           oklch(0.10 0.018 152);  /* near-black, green-tinted "ink" */
 --foreground:           oklch(0.95 0.004 152);
---card:                 oklch(0.16 0.016 250);
---primary:              oklch(0.70 0.16 152);    /* brighter green in dark */
+--card:                 oklch(0.16 0.02 152);
+--primary:              oklch(0.72 0.19 152);    /* brighter turf in dark */
 --secondary:            oklch(0.24 0.02 152);
 --muted:                oklch(0.22 0.014 250);
---muted-foreground:     oklch(0.62 0.016 250);
+--muted-foreground:     oklch(0.64 0.016 250);
 --accent:               oklch(0.24 0.03 250);
---brand-accent:         oklch(0.65 0.17 250);
+--brand-accent:         oklch(0.60 0.18 250);
+--floodlight:           oklch(0.78 0.16 78);
+--floodlight-foreground: oklch(0.16 0.03 78);
 --border:               oklch(1 0 0 / 9%);
 --input:                oklch(1 0 0 / 12%);
---shadow-glow:          0 0 28px oklch(0.70 0.16 152 / 0.35);
---shadow-glow-navy:     0 0 28px oklch(0.65 0.17 250 / 0.35);
+--shadow-glow:          0 0 28px oklch(0.72 0.19 152 / 0.35);
+--shadow-glow-navy:     0 0 28px oklch(0.60 0.18 250 / 0.35);
+--shadow-glow-floodlight: 0 0 32px oklch(0.78 0.16 78 / 0.40);
 ```
 
 ### Sidebar tokens
@@ -141,16 +149,20 @@ Core to FR-40 (past actions colored, upcoming grayed, next action highlighted):
 
 ## Typography
 
-Two Google Fonts loaded via `next/font/google` in the root `[locale]` layout:
+Three Google Fonts loaded via `next/font/google` in the root `[locale]` layout:
 
 | Font | CSS variable | Tailwind class | Use |
 |---|---|---|---|
-| **Inter** | `--font-sans` | `font-sans` (default body) | All UI text, body, forms, labels, comments |
-| **Barlow Condensed (Bold)** | `--font-display` | `font-display font-bold` | Scores, team names, action titles, timeline dates |
+| **Figtree** | `--font-sans` | `font-sans` (default body) | All UI text, body, forms, labels, comments |
+| **Barlow Condensed (Bold)** | `--font-display` | `font-display font-bold` | Card titles, section heads, dates, nav |
+| **Anton** | `--font-impact` | `font-impact` | Used sparingly: hero headlines, scorelines, big stat numbers only — never body text |
 
 ```html
 <!-- Action title on a timeline card -->
 <p class="font-display font-bold text-2xl uppercase tracking-wide">FC Sokol vs. Slavia B</p>
+
+<!-- Scoreline — the one place Anton shows up on a card -->
+<span class="font-impact text-lg">2&nbsp;:&nbsp;1</span>
 
 <!-- Body / label text -->
 <p class="font-sans text-sm text-muted-foreground">Match · League · 12 Oct 2026</p>
@@ -164,13 +176,24 @@ Defined in `src/app/globals.css` `@layer utilities`. All have `.dark` variants.
 
 | Class | What it does | Typical use |
 |---|---|---|
-| `.gradient-brand` | `135deg` pitch green → kit navy | Primary CTAs, hero backgrounds |
+| `.gradient-brand` | `135deg` turf → kit navy | Primary CTAs |
 | `.gradient-text` | Same gradient clipped to text | App name, accent headings |
-| `.gradient-hero` | Subtle green wash | Landing hero section |
-| `.gradient-pitch` | Diagonal mown-grass stripe pattern, very low contrast | Team Home hero backdrop only |
+| `.gradient-hero` | Two-blob floodlight + turf radial mesh wash | Landing hero, team page header |
+| `.bg-pitch-lines` | Faint halfway-line + center-circle watermark | Hero/team-header backdrops — texture, not a graphic |
+| `.bg-grain` | Subtle film-grain overlay (apply to a `relative` ancestor) | Paired with `.gradient-hero` for a dusk-kickoff feel |
 | `.glass` | `backdrop-blur(16px)` + semi-transparent bg + border | Floating headers, sticky timeline "next action" bar |
 | `.shadow-glow` | `var(--shadow-glow)` | Highlighted elements, active/selected states |
 | `.shadow-glow-navy` | `var(--shadow-glow-navy)` | Admin-only actions, secondary emphasis |
+| `.shadow-glow-floodlight` | `var(--shadow-glow-floodlight)` | Next-match card, floodlight-themed highlights |
+| `.ticket-seam` + `.ticket-notch` | Dashed seam + punched circle notches | Past-result timeline cards — a torn ticket-stub motif |
+
+### Ambient page background
+
+`<AmbientBackground />` (`src/components/layout/AmbientBackground.tsx`) is mounted once in the
+root `[locale]` layout, fixed behind everything: paints `--background` and four soft blurred
+turf/floodlight/navy blobs. `body` itself no longer paints a background color — that's this
+component's job — so any page section without its own opaque background (Card, `.glass`, etc.
+still set their own) lets the ambient shapes show through.
 
 Gradient text:
 ```html

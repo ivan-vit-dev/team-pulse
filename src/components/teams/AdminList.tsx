@@ -39,14 +39,17 @@ export function AdminList({ teamId, admins }: AdminListProps) {
   return (
     <ul className="divide-y divide-border">
       {admins.map((admin) => (
-        <li key={admin.uid} className="flex items-center justify-between py-2">
-          <div>
-            <p className="text-sm font-medium">{admin.displayName}</p>
-            {admin.email && <p className="text-xs text-muted-foreground">{admin.email}</p>}
+        <li key={admin.uid} className="flex items-center justify-between gap-2 py-2">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium">{admin.displayName}</p>
+            {admin.email && (
+              <p className="truncate text-xs text-muted-foreground">{admin.email}</p>
+            )}
           </div>
           <Button
             variant="ghost"
             size="sm"
+            className="shrink-0"
             disabled={removingUid === admin.uid || admins.length <= 1}
             onClick={() => handleRemove(admin.uid)}
           >

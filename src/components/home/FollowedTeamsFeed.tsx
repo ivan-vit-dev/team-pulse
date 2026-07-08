@@ -15,6 +15,7 @@ interface FollowedTeamsFeedProps {
   entries: FeedEntry[];
   noUpcomingActionsLabel: string;
   commentsLabel: string;
+  nextLabel: string;
   currentUid: string;
 }
 
@@ -22,6 +23,7 @@ export function FollowedTeamsFeed({
   entries,
   noUpcomingActionsLabel,
   commentsLabel,
+  nextLabel,
   currentUid,
 }: FollowedTeamsFeedProps) {
   return (
@@ -45,6 +47,7 @@ export function FollowedTeamsFeed({
               teamId={team.id}
               currentUid={currentUid}
               commentsLabel={commentsLabel}
+              nextLabel={nextLabel}
             />
           ) : (
             <p className="pl-10 text-sm text-muted-foreground">{noUpcomingActionsLabel}</p>

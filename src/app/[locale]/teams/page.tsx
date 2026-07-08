@@ -17,14 +17,14 @@ export default async function TeamsDirectoryPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-bold">{t("browseTeams")}</h1>
+      <h1 className="font-impact text-4xl uppercase">{t("browseTeams")}</h1>
 
       {teams.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("noTeamsAtAll")}</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {teams.map((team) => (
-            <Card key={team.id}>
+            <Card key={team.id} className="group transition-colors hover:[border-color:var(--primary)]">
               <CardContent className="flex items-center gap-4 pt-6">
                 <Avatar className="h-12 w-12 rounded-lg">
                   {team.logoURL && <AvatarImage src={team.logoURL} alt="" />}

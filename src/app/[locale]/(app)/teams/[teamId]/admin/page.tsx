@@ -73,42 +73,71 @@ export default async function TeamAdminPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold">{team.name}</h1>
-        <Button variant="outline" render={<Link href={`/teams/${teamId}`}>{t("viewTeamPage")}</Link>} />
+      {/* Identity block: logo + name + quick stats, one richer surface
+          instead of a plain header row + a separate logo card. */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div
+          className="relative overflow-hidden rounded-2xl border p-6 lg:col-span-2"
+          style={{
+            borderColor: "color-mix(in oklch, var(--brand-accent) 35%, var(--border))",
+            background:
+              "radial-gradient(120% 140% at 100% 0%, color-mix(in oklch, var(--brand-accent) 14%, transparent), transparent 60%), var(--card)",
+          }}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <TeamLogoUploader teamId={teamId} teamName={team.name} logoURL={team.logoURL} />
+            <Button
+              variant="outline"
+              render={<Link href={`/teams/${teamId}`}>{t("viewTeamPage")}</Link>}
+            />
+          </div>
+          <h1 className="font-impact mt-5 text-4xl uppercase">{team.name}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {team.category}
+            {team.club ? ` · ${team.club}` : ""}
+            {team.location ? ` · ${team.location}` : ""}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-1">
+          <div className="rounded-2xl border border-border bg-card p-5">
+            <p className="font-display text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              {t("admins")}
+            </p>
+            <p className="font-impact mt-1 text-3xl">{admins.length}</p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-5">
+            <p className="font-display text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              {t("roster")}
+            </p>
+            <p className="font-impact mt-1 text-3xl">{players.length}</p>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <h2 className="font-display text-lg font-bold">{t("logo")}</h2>
-        </CardHeader>
-        <CardContent>
-          <TeamLogoUploader teamId={teamId} teamName={team.name} logoURL={team.logoURL} />
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <h2 className="font-display text-lg font-bold">{t("teamInfo")}</h2>
+          </CardHeader>
+          <CardContent>
+            <EditTeamForm team={clientTeam} />
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <h2 className="font-display text-lg font-bold">{t("teamInfo")}</h2>
-        </CardHeader>
-        <CardContent>
-          <EditTeamForm team={clientTeam} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <h2 className="font-display text-lg font-bold">{t("admins")}</h2>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <AdminList teamId={teamId} admins={admins} />
-          <InviteAdminForm teamId={teamId} />
-          <PendingInvitesList
-            teamId={teamId}
-            invites={invites.map((invite) => omit(invite, "createdAt", "updatedAt"))}
-          />
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <h2 className="font-display text-lg font-bold">{t("admins")}</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <AdminList teamId={teamId} admins={admins} />
+            <InviteAdminForm teamId={teamId} />
+            <PendingInvitesList
+              teamId={teamId}
+              invites={invites.map((invite) => omit(invite, "createdAt", "updatedAt"))}
+            />
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -126,54 +155,56 @@ export default async function TeamAdminPage({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <h2 className="font-display text-lg font-bold">{ts("title")}</h2>
-          <Button
-            size="sm"
-            render={<Link href={`/teams/${teamId}/admin/seasons/new`}>{ts("addSeason")}</Link>}
-          />
-        </CardHeader>
-        <CardContent>
-          <SeasonAdminList teamId={teamId} seasons={clientSeasons} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h2 className="font-display text-lg font-bold">{ta("title")}</h2>
-            {selectedSeason && (
-              <SeasonSwitcher
-                teamId={teamId}
-                seasons={clientSeasons}
-                selectedSeasonId={selectedSeason.id}
-              />
-            )}
-          </div>
-          {selectedSeason && (
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <h2 className="font-display text-lg font-bold">{ts("title")}</h2>
             <Button
               size="sm"
-              render={
-                <Link href={`/teams/${teamId}/admin/seasons/${selectedSeason.id}/actions/new`}>
-                  {ta("addAction")}
-                </Link>
-              }
+              render={<Link href={`/teams/${teamId}/admin/seasons/new`}>{ts("addSeason")}</Link>}
             />
-          )}
-        </CardHeader>
-        <CardContent>
-          {selectedSeason ? (
-            <ActionAdminList
-              teamId={teamId}
-              seasonId={selectedSeason.id}
-              actions={actionsForSeason.map((action) => omit(action, "createdAt", "updatedAt"))}
-            />
-          ) : (
-            <p className="text-sm text-muted-foreground">{ta("noActiveSeason")}</p>
-          )}
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            <SeasonAdminList teamId={teamId} seasons={clientSeasons} />
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h2 className="font-display text-lg font-bold">{ta("title")}</h2>
+              {selectedSeason && (
+                <SeasonSwitcher
+                  teamId={teamId}
+                  seasons={clientSeasons}
+                  selectedSeasonId={selectedSeason.id}
+                />
+              )}
+            </div>
+            {selectedSeason && (
+              <Button
+                size="sm"
+                render={
+                  <Link href={`/teams/${teamId}/admin/seasons/${selectedSeason.id}/actions/new`}>
+                    {ta("addAction")}
+                  </Link>
+                }
+              />
+            )}
+          </CardHeader>
+          <CardContent>
+            {selectedSeason ? (
+              <ActionAdminList
+                teamId={teamId}
+                seasonId={selectedSeason.id}
+                actions={actionsForSeason.map((action) => omit(action, "createdAt", "updatedAt"))}
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground">{ta("noActiveSeason")}</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

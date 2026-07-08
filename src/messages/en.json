@@ -43,6 +43,8 @@
     "notifications": "Notification preferences",
     "emailNotifications": "Email notifications",
     "pushNotifications": "Push notifications",
+    "pushPermissionDenied": "Enable notifications in your browser settings to receive push alerts.",
+    "pushNotSupported": "Push notifications aren't supported in this browser.",
     "myTeams": "Followed teams",
     "noTeamsYet": "You're not following any teams yet.",
     "saved": "Profile updated."

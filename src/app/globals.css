@@ -40,6 +40,9 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-brand-accent: var(--brand-accent);
+  --color-floodlight: var(--floodlight);
+  --color-floodlight-foreground: var(--floodlight-foreground);
+  --font-impact: var(--font-impact);
   --color-action-match: var(--action-match);
   --color-action-training: var(--action-training);
   --color-action-tournament: var(--action-tournament);
@@ -54,15 +57,18 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Pitch Green / Kit Navy palette — see APP_DESIGN.md */
+/* Turf / Floodlight / Kit Navy palette — see APP_DESIGN.md.
+   "Matchday, under lights": a deeper, more saturated pitch green,
+   a warm sodium-floodlight gold, and a proper red-card red — dusk
+   kick-off, not a SaaS dashboard. */
 :root {
-  --background: oklch(0.98 0.004 152);
-  --foreground: oklch(0.14 0.02 250);
+  --background: oklch(0.975 0.006 95);
+  --foreground: oklch(0.16 0.02 250);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.14 0.02 250);
+  --card-foreground: oklch(0.16 0.02 250);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.14 0.02 250);
-  --primary: oklch(0.62 0.15 152);
+  --popover-foreground: oklch(0.16 0.02 250);
+  --primary: oklch(0.56 0.17 152);
   --primary-foreground: oklch(0.99 0.005 152);
   --secondary: oklch(0.93 0.015 152);
   --secondary-foreground: oklch(0.28 0.05 152);
@@ -70,19 +76,22 @@
   --muted-foreground: oklch(0.48 0.02 250);
   --accent: oklch(0.91 0.02 250);
   --accent-foreground: oklch(0.22 0.06 250);
-  --brand-accent: oklch(0.55 0.18 250);
+  --brand-accent: oklch(0.42 0.15 250);
+  --floodlight: oklch(0.74 0.15 75);
+  --floodlight-foreground: oklch(0.24 0.05 75);
   --destructive: oklch(0.577 0.245 27);
   --border: oklch(0.89 0.008 250);
   --input: oklch(0.89 0.008 250);
-  --ring: oklch(0.62 0.15 152);
-  --chart-1: oklch(0.62 0.15 152);
-  --chart-2: oklch(0.55 0.18 250);
-  --chart-3: oklch(0.70 0.14 85);
+  --ring: oklch(0.56 0.17 152);
+  --chart-1: oklch(0.56 0.17 152);
+  --chart-2: oklch(0.42 0.15 250);
+  --chart-3: oklch(0.74 0.15 75);
   --chart-4: oklch(0.55 0.20 300);
   --chart-5: oklch(0.60 0.19 25);
   --radius: 0.75rem;
-  --shadow-glow: 0 0 24px oklch(0.62 0.15 152 / 0.30);
-  --shadow-glow-navy: 0 0 24px oklch(0.55 0.18 250 / 0.30);
+  --shadow-glow: 0 0 24px oklch(0.56 0.17 152 / 0.30);
+  --shadow-glow-navy: 0 0 24px oklch(0.42 0.15 250 / 0.30);
+  --shadow-glow-floodlight: 0 0 28px oklch(0.74 0.15 75 / 0.35);
 
   --action-match: oklch(0.60 0.19 25);
   --action-training: oklch(0.58 0.14 230);
@@ -92,7 +101,9 @@
 
   --timeline-past-opacity: 1;
   --timeline-upcoming-filter: grayscale(0.7) opacity(0.55);
-  --timeline-next-ring: 0 0 0 3px var(--team-primary, var(--primary));
+  /* Deliberately floodlight gold, not team-brand — a universal "spotlight"
+     cue that reads the same across every team's own colors. */
+  --timeline-next-ring: 0 0 0 3px var(--floodlight);
 
   --sidebar: oklch(0.96 0.008 250);
   --sidebar-foreground: oklch(0.14 0.02 250);
@@ -105,32 +116,35 @@
 }
 
 .dark {
-  --background: oklch(0.11 0.012 250);
+  --background: oklch(0.10 0.018 152);
   --foreground: oklch(0.95 0.004 152);
-  --card: oklch(0.16 0.016 250);
+  --card: oklch(0.16 0.02 152);
   --card-foreground: oklch(0.95 0.004 152);
-  --popover: oklch(0.16 0.016 250);
+  --popover: oklch(0.16 0.02 152);
   --popover-foreground: oklch(0.95 0.004 152);
-  --primary: oklch(0.70 0.16 152);
+  --primary: oklch(0.72 0.19 152);
   --primary-foreground: oklch(0.10 0.01 152);
   --secondary: oklch(0.24 0.02 152);
   --secondary-foreground: oklch(0.95 0.004 152);
   --muted: oklch(0.22 0.014 250);
-  --muted-foreground: oklch(0.62 0.016 250);
+  --muted-foreground: oklch(0.64 0.016 250);
   --accent: oklch(0.24 0.03 250);
   --accent-foreground: oklch(0.95 0.004 152);
-  --brand-accent: oklch(0.65 0.17 250);
+  --brand-accent: oklch(0.60 0.18 250);
+  --floodlight: oklch(0.78 0.16 78);
+  --floodlight-foreground: oklch(0.16 0.03 78);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.70 0.16 152);
-  --chart-1: oklch(0.70 0.16 152);
-  --chart-2: oklch(0.65 0.17 250);
-  --chart-3: oklch(0.76 0.15 85);
+  --ring: oklch(0.72 0.19 152);
+  --chart-1: oklch(0.72 0.19 152);
+  --chart-2: oklch(0.60 0.18 250);
+  --chart-3: oklch(0.78 0.16 78);
   --chart-4: oklch(0.62 0.21 300);
   --chart-5: oklch(0.66 0.20 25);
-  --shadow-glow: 0 0 28px oklch(0.70 0.16 152 / 0.35);
-  --shadow-glow-navy: 0 0 28px oklch(0.65 0.17 250 / 0.35);
+  --shadow-glow: 0 0 28px oklch(0.72 0.19 152 / 0.35);
+  --shadow-glow-navy: 0 0 28px oklch(0.60 0.18 250 / 0.35);
+  --shadow-glow-floodlight: 0 0 32px oklch(0.78 0.16 78 / 0.40);
 
   --action-match: oklch(0.66 0.20 25);
   --action-training: oklch(0.65 0.15 230);
@@ -159,7 +173,10 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    /* Background color is painted by the fixed <AmbientBackground> layer,
+       not here — lets its blurred shapes show through any section that
+       doesn't set its own opaque background (Card, .glass, etc. still do). */
+    @apply text-foreground;
   }
   html {
     @apply font-sans;
@@ -176,12 +193,12 @@
     -webkit-background-clip: text;
     color: transparent;
   }
+  /* Floodlight mesh wash — two warm/cool radial blobs, dusk-kickoff feel.
+     Replaces the old single flat linear-gradient wash. */
   .gradient-hero {
-    background: linear-gradient(
-      180deg,
-      color-mix(in oklch, var(--primary) 12%, transparent),
-      transparent
-    );
+    background:
+      radial-gradient(ellipse 120% 60% at 12% 0%, color-mix(in oklch, var(--floodlight) 16%, transparent), transparent 60%),
+      radial-gradient(ellipse 90% 55% at 92% 10%, color-mix(in oklch, var(--primary) 18%, transparent), transparent 55%);
   }
   .glass {
     backdrop-filter: blur(16px);
@@ -193,6 +210,49 @@
   }
   .shadow-glow-navy {
     box-shadow: var(--shadow-glow-navy);
+  }
+  .shadow-glow-floodlight {
+    box-shadow: var(--shadow-glow-floodlight);
+  }
+  /* Faint halfway-line + center-circle watermark for hero/team-header
+     backdrops. Very low contrast by design — a texture, not a graphic. */
+  .bg-pitch-lines {
+    background-image:
+      linear-gradient(color-mix(in oklch, var(--foreground) 6%, transparent), color-mix(in oklch, var(--foreground) 6%, transparent)),
+      radial-gradient(circle at 50% 100%, transparent 130px, color-mix(in oklch, var(--foreground) 6%, transparent) 131px, color-mix(in oklch, var(--foreground) 6%, transparent) 133px, transparent 134px);
+    background-size: 100% 1px, 100% 100%;
+    background-position: 50% 60%, 0 0;
+    background-repeat: no-repeat;
+  }
+  /* Subtle film-grain overlay — apply to a `relative` ancestor. */
+  .bg-grain {
+    position: relative;
+  }
+  .bg-grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  .dark .bg-grain::before {
+    opacity: 0.05;
+  }
+  /* Ticket-stub seam for "past" timeline cards — a punched dashed line.
+     Pair with two `.ticket-notch` elements positioned at the seam. */
+  .ticket-seam {
+    border-top: 2px dashed var(--border);
+  }
+  .ticket-notch {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--background);
+    border: 1px solid var(--border);
   }
 }
 
@@ -213,7 +273,7 @@
     box-shadow: var(--timeline-next-ring);
   }
   50% {
-    box-shadow: 0 0 0 6px color-mix(in oklch, var(--team-primary, var(--primary)) 40%, transparent);
+    box-shadow: 0 0 0 6px color-mix(in oklch, var(--floodlight) 40%, transparent);
   }
 }
 

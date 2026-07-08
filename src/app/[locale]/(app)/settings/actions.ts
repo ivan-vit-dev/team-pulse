@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import { requireUid } from "@/lib/auth/require-uid";
-import { updateUserProfile } from "@/lib/users/user-repository";
+import { addFcmToken, removeFcmToken, updateUserProfile } from "@/lib/users/user-repository";
 
 const profileSchema = z.object({
   displayName: z.string().min(2),
@@ -32,4 +32,14 @@ export async function updateNotificationPrefsAction(
 export async function updateAvatarAction(photoURL: string) {
   const uid = await requireUid();
   await updateUserProfile(uid, { photoURL });
+}
+
+export async function registerFcmTokenAction(token: string) {
+  const uid = await requireUid();
+  await addFcmToken(uid, token);
+}
+
+export async function unregisterFcmTokenAction(token: string) {
+  const uid = await requireUid();
+  await removeFcmToken(uid, token);
 }

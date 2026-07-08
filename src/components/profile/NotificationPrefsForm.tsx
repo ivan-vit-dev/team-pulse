@@ -1,13 +1,20 @@
 "use client";
 
+import { getToken } from "firebase/messaging";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { updateNotificationPrefsAction } from "@/app/[locale]/(app)/settings/actions";
+import {
+  registerFcmTokenAction,
+  unregisterFcmTokenAction,
+  updateNotificationPrefsAction,
+} from "@/app/[locale]/(app)/settings/actions";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { firebaseVapidKey } from "@/lib/firebase/config";
+import { getFcmMessaging } from "@/lib/firebase/client";
 import type { NotificationPreferences } from "@/lib/types/user";
 
 interface NotificationPrefsFormProps {
@@ -21,8 +28,8 @@ export function NotificationPrefsForm({ preferences }: NotificationPrefsFormProp
   const [prefs, setPrefs] = useState(preferences);
   const [isSaving, setIsSaving] = useState(false);
 
-  async function handleChange(key: keyof NotificationPreferences, value: boolean) {
-    const next = { ...prefs, [key]: value };
+  async function handleEmailChange(value: boolean) {
+    const next = { ...prefs, email: value };
     setPrefs(next);
     setIsSaving(true);
     try {
@@ -30,6 +37,47 @@ export function NotificationPrefsForm({ preferences }: NotificationPrefsFormProp
       router.refresh();
     } catch {
       setPrefs(prefs);
+      toast.error(ta("genericError"));
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  // Not optimistic like email: a browser permission prompt can take a while
+  // to resolve, and we don't want the switch to appear "on" before a token
+  // is actually registered.
+  async function handlePushChange(checked: boolean) {
+    setIsSaving(true);
+    try {
+      if (checked) {
+        const messaging = await getFcmMessaging();
+        if (!messaging) {
+          toast.error(t("pushNotSupported"));
+          return;
+        }
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          toast.error(t("pushPermissionDenied"));
+          return;
+        }
+        if (!firebaseVapidKey) {
+          toast.error(ta("genericError"));
+          return;
+        }
+        const token = await getToken(messaging, { vapidKey: firebaseVapidKey });
+        await registerFcmTokenAction(token);
+      } else {
+        const messaging = await getFcmMessaging();
+        if (messaging && firebaseVapidKey) {
+          const token = await getToken(messaging, { vapidKey: firebaseVapidKey });
+          await unregisterFcmTokenAction(token);
+        }
+      }
+      const next = { ...prefs, push: checked };
+      await updateNotificationPrefsAction(next);
+      setPrefs(next);
+      router.refresh();
+    } catch {
       toast.error(ta("genericError"));
     } finally {
       setIsSaving(false);
@@ -44,7 +92,7 @@ export function NotificationPrefsForm({ preferences }: NotificationPrefsFormProp
           id="email-notifications"
           checked={prefs.email}
           disabled={isSaving}
-          onCheckedChange={(checked: boolean) => handleChange("email", checked)}
+          onCheckedChange={(checked: boolean) => handleEmailChange(checked)}
         />
       </div>
       <div className="flex items-center justify-between">
@@ -53,7 +101,7 @@ export function NotificationPrefsForm({ preferences }: NotificationPrefsFormProp
           id="push-notifications"
           checked={prefs.push}
           disabled={isSaving}
-          onCheckedChange={(checked: boolean) => handleChange("push", checked)}
+          onCheckedChange={(checked: boolean) => handlePushChange(checked)}
         />
       </div>
     </div>

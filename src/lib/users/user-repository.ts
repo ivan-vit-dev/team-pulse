@@ -51,6 +51,7 @@ export async function ensureUserProfile(
     locale: input.locale,
     notificationPreferences: DEFAULT_NOTIFICATION_PREFERENCES,
     followedTeamIds: [],
+    fcmTokens: [],
     role: "fan",
   };
 
@@ -112,6 +113,20 @@ export async function followTeam(uid: string, teamId: string): Promise<void> {
 export async function unfollowTeam(uid: string, teamId: string): Promise<void> {
   await usersCollection.doc(uid).update({
     followedTeamIds: FieldValue.arrayRemove(teamId),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}
+
+export async function addFcmToken(uid: string, token: string): Promise<void> {
+  await usersCollection.doc(uid).update({
+    fcmTokens: FieldValue.arrayUnion(token),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}
+
+export async function removeFcmToken(uid: string, token: string): Promise<void> {
+  await usersCollection.doc(uid).update({
+    fcmTokens: FieldValue.arrayRemove(token),
     updatedAt: FieldValue.serverTimestamp(),
   });
 }

@@ -76,35 +76,45 @@ export default async function TeamPage({
 
   return (
     <div className="team-scope space-y-6" style={teamScopeStyle}>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16 rounded-lg" size="lg">
-            {team.logoURL && <AvatarImage src={team.logoURL} alt="" />}
-            <AvatarFallback className="rounded-lg">
-              {team.name.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="font-display text-2xl font-bold">{team.name}</h1>
-            <p className="text-sm text-muted-foreground">
-              {team.category}
-              {team.club ? ` · ${team.club}` : ""}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {team.location} · {team.homePitch}
-            </p>
+      <div className="bg-pitch-lines relative overflow-hidden rounded-2xl border border-border p-6">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-[1]"
+          style={{
+            background:
+              "radial-gradient(90% 140% at 100% 0%, color-mix(in oklch, var(--primary) 12%, transparent), transparent 60%)",
+          }}
+        />
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16 rounded-lg" size="lg">
+              {team.logoURL && <AvatarImage src={team.logoURL} alt="" />}
+              <AvatarFallback className="rounded-lg">
+                {team.name.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h1 className="font-impact text-3xl uppercase">{team.name}</h1>
+              <p className="text-sm text-muted-foreground">
+                {team.category}
+                {team.club ? ` · ${team.club}` : ""}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {team.location} · {team.homePitch}
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {user && (
-            <FollowButton
-              teamId={teamId}
-              initialIsFollowing={user.followedTeamIds.includes(teamId)}
-            />
-          )}
-          {isAdmin && (
-            <Button variant="outline" render={<Link href={`/teams/${teamId}/admin`}>{t("adminDashboard")}</Link>} />
-          )}
+          <div className="flex items-center gap-2">
+            {user && (
+              <FollowButton
+                teamId={teamId}
+                initialIsFollowing={user.followedTeamIds.includes(teamId)}
+              />
+            )}
+            {isAdmin && (
+              <Button variant="outline" render={<Link href={`/teams/${teamId}/admin`}>{t("adminDashboard")}</Link>} />
+            )}
+          </div>
         </div>
       </div>
 

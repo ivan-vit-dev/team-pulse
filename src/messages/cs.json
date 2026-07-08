@@ -43,6 +43,8 @@
     "notifications": "Nastavení oznámení",
     "emailNotifications": "E-mailová oznámení",
     "pushNotifications": "Push oznámení",
+    "pushPermissionDenied": "Pro příjem push oznámení povolte oznámení v nastavení prohlížeče.",
+    "pushNotSupported": "Push oznámení nejsou v tomto prohlížeči podporována.",
     "myTeams": "Sledované týmy",
     "noTeamsYet": "Zatím nesledujete žádné týmy.",
     "saved": "Profil byl aktualizován."
