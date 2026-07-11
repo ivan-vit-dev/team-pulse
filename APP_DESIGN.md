@@ -7,11 +7,11 @@ timeline conventions. Update this when adding new reusable UI patterns.
 
 ## Color System
 
-**"Matchday, under lights"** — a deeper, more saturated pitch green (hue 152) paired with a
-richer kit navy (hue 250) and a new warm sodium-floodlight gold accent (hue 75). The floodlight
-tone is dusk-kickoff energy, not a generic amber/warning color — it's reserved for glow effects,
-the timeline's "next" ring, and hero eyebrows. Distinct from any violet palette used in other
-projects — don't reuse those hues here.
+**"Matchday, under lights"** — a deep royal navy (hue 250) paired with a vivid teal accent
+(hue 195) and a warm sodium-floodlight gold accent (hue 75). The floodlight tone is dusk-kickoff
+energy, not a generic amber/warning color — it's reserved for glow effects, the timeline's "next"
+ring, and hero eyebrows. Distinct from any violet palette used in other projects — don't reuse
+those hues here.
 
 All colors use `oklch()` values. **Do not use opacity modifiers** (`bg-primary/50`) — they break
 with CSS variable-based tokens. Use `color-mix()` instead:
@@ -33,45 +33,45 @@ background: color-mix(in oklch, var(--primary) 15%, transparent);
 --card-foreground:      oklch(0.16 0.02 250);
 --popover:              oklch(1 0 0);
 --popover-foreground:   oklch(0.16 0.02 250);
---primary:              oklch(0.56 0.17 152);    /* deep turf green */
---primary-foreground:   oklch(0.99 0.005 152);
---secondary:            oklch(0.93 0.015 152);
---secondary-foreground: oklch(0.28 0.05 152);
+--primary:              oklch(0.56 0.17 250);    /* deep royal navy */
+--primary-foreground:   oklch(0.99 0.005 250);
+--secondary:            oklch(0.93 0.015 250);
+--secondary-foreground: oklch(0.28 0.05 250);
 --muted:                oklch(0.93 0.006 250);
 --muted-foreground:     oklch(0.48 0.02 250);
 --accent:               oklch(0.91 0.02 250);
 --accent-foreground:    oklch(0.22 0.06 250);
---brand-accent:         oklch(0.42 0.15 250);    /* deep kit navy blue */
+--brand-accent:         oklch(0.42 0.15 195);    /* vivid teal */
 --floodlight:           oklch(0.74 0.15 75);     /* sodium floodlight gold */
 --floodlight-foreground: oklch(0.24 0.05 75);
 --destructive:          oklch(0.577 0.245 27);
 --border:               oklch(0.89 0.008 250);
 --input:                oklch(0.89 0.008 250);
---ring:                 oklch(0.56 0.17 152);
+--ring:                 oklch(0.56 0.17 250);
 --radius:               0.75rem;
---shadow-glow:          0 0 24px oklch(0.56 0.17 152 / 0.30);
---shadow-glow-navy:     0 0 24px oklch(0.42 0.15 250 / 0.30);
+--shadow-glow:          0 0 24px oklch(0.56 0.17 250 / 0.30);
+--shadow-glow-accent:   0 0 24px oklch(0.42 0.15 195 / 0.30);
 --shadow-glow-floodlight: 0 0 28px oklch(0.74 0.15 75 / 0.35);
 ```
 
 ### Dark mode tokens (`.dark`)
 
 ```css
---background:           oklch(0.10 0.018 152);  /* near-black, green-tinted "ink" */
---foreground:           oklch(0.95 0.004 152);
---card:                 oklch(0.16 0.02 152);
---primary:              oklch(0.72 0.19 152);    /* brighter turf in dark */
---secondary:            oklch(0.24 0.02 152);
+--background:           oklch(0.10 0.018 250);  /* near-black, navy-tinted "ink" */
+--foreground:           oklch(0.95 0.004 250);
+--card:                 oklch(0.16 0.02 250);
+--primary:              oklch(0.72 0.19 250);    /* brighter navy in dark */
+--secondary:            oklch(0.24 0.02 250);
 --muted:                oklch(0.22 0.014 250);
 --muted-foreground:     oklch(0.64 0.016 250);
 --accent:               oklch(0.24 0.03 250);
---brand-accent:         oklch(0.60 0.18 250);
+--brand-accent:         oklch(0.60 0.18 195);
 --floodlight:           oklch(0.78 0.16 78);
 --floodlight-foreground: oklch(0.16 0.03 78);
 --border:               oklch(1 0 0 / 9%);
 --input:                oklch(1 0 0 / 12%);
---shadow-glow:          0 0 28px oklch(0.72 0.19 152 / 0.35);
---shadow-glow-navy:     0 0 28px oklch(0.60 0.18 250 / 0.35);
+--shadow-glow:          0 0 28px oklch(0.72 0.19 250 / 0.35);
+--shadow-glow-accent:   0 0 28px oklch(0.60 0.18 195 / 0.35);
 --shadow-glow-floodlight: 0 0 32px oklch(0.78 0.16 78 / 0.40);
 ```
 
@@ -113,26 +113,32 @@ apply a team override, scoped to a wrapper element so it never leaks into global
 }
 ```
 
-Never hardcode a team's hex value outside this scope. Fall back to the app `--primary` (pitch
-green) if a team hasn't set custom colors yet.
+Never hardcode a team's hex value outside this scope. Fall back to the app `--primary` (navy)
+if a team hasn't set custom colors yet.
 
 ### Action-type tokens
 
-Analogous to a rarity system, but for action types (SRS FR-22). Each has a base color and a
-foreground (`-fg`) for text/icons on that background. Used for action-type chips and timeline
-markers — always in addition to, never instead of, the team-brand color.
+Analogous to a rarity system, but for action types (SRS FR-22). Each has a base color (solid
+marker/fill use — timeline dots, borders) and an `-foreground` variant (text/icon use on top of
+the base color's own `color-mix()` tint). Used for action-type chips and timeline markers —
+always in addition to, never instead of, the team-brand color.
 
-| Action type | CSS token | Light value | Dark value |
-|---|---|---|---|
-| match | `--action-match` | `oklch(0.60 0.19 25)` | `oklch(0.66 0.20 25)` |
-| training | `--action-training` | `oklch(0.58 0.14 230)` | `oklch(0.65 0.15 230)` |
-| tournament | `--action-tournament` | `oklch(0.70 0.14 85)` | `oklch(0.76 0.15 85)` |
-| cup | `--action-cup` | `oklch(0.55 0.20 300)` | `oklch(0.62 0.21 300)` |
-| other | `--action-other` | `oklch(0.65 0.01 250)` | `oklch(0.68 0.01 250)` |
+The base tone is tuned to read as a solid marker; painted directly as text over its own ~18%
+tint it falls short of WCAG AA (as low as 2.3:1 in light mode). The `-foreground` variant keeps
+the same hue/chroma but pushes lightness far enough to clear 4.5:1 against that tint — always use
+it for text/icon color on `ActionTypeBadge`, never the base token.
+
+| Action type | Base token | Light value | Dark value | Foreground token | Light value | Dark value |
+|---|---|---|---|---|---|---|
+| match | `--action-match` | `oklch(0.60 0.19 25)` | `oklch(0.66 0.20 25)` | `--action-match-foreground` | `oklch(0.52 0.19 25)` | `oklch(0.67 0.20 25)` |
+| training | `--action-training` | `oklch(0.58 0.14 230)` | `oklch(0.65 0.15 230)` | `--action-training-foreground` | `oklch(0.47 0.14 230)` | `oklch(0.65 0.15 230)` |
+| tournament | `--action-tournament` | `oklch(0.70 0.14 85)` | `oklch(0.76 0.15 85)` | `--action-tournament-foreground` | `oklch(0.52 0.14 85)` | `oklch(0.76 0.15 85)` |
+| cup | `--action-cup` | `oklch(0.55 0.20 300)` | `oklch(0.62 0.21 300)` | `--action-cup-foreground` | `oklch(0.52 0.20 300)` | `oklch(0.67 0.21 300)` |
+| other | `--action-other` | `oklch(0.65 0.01 250)` | `oklch(0.68 0.01 250)` | `--action-other-foreground` | `oklch(0.51 0.01 250)` | `oklch(0.68 0.01 250)` |
 
 ```tsx
-<ActionTypeBadge type="match" />          // uses --action-match
-<span style={{ color: "var(--action-tournament)" }} />
+<ActionTypeBadge type="match" />          // bg: --action-match tint, text: --action-match-foreground
+<span style={{ color: "var(--action-tournament)" }} />  // solid marker use (timeline dot), not text
 ```
 
 ### Timeline state tokens
@@ -153,15 +159,15 @@ Three Google Fonts loaded via `next/font/google` in the root `[locale]` layout:
 
 | Font | CSS variable | Tailwind class | Use |
 |---|---|---|---|
-| **Figtree** | `--font-sans` | `font-sans` (default body) | All UI text, body, forms, labels, comments |
-| **Barlow Condensed (Bold)** | `--font-display` | `font-display font-bold` | Card titles, section heads, dates, nav |
-| **Anton** | `--font-impact` | `font-impact` | Used sparingly: hero headlines, scorelines, big stat numbers only — never body text |
+| **Roboto** | `--font-sans` | `font-sans` (default body) | All UI text, body, forms, labels, comments |
+| **Roboto (Bold)** | `--font-display` | `font-display font-bold` | Card titles, section heads, dates, nav |
+| **Roboto Condensed (Bold)** | `--font-impact` | `font-impact` | Used sparingly: hero headlines, scorelines, big stat numbers only — never body text |
 
 ```html
 <!-- Action title on a timeline card -->
 <p class="font-display font-bold text-2xl uppercase tracking-wide">FC Sokol vs. Slavia B</p>
 
-<!-- Scoreline — the one place Anton shows up on a card -->
+<!-- Scoreline — the one place font-impact shows up on a card -->
 <span class="font-impact text-lg">2&nbsp;:&nbsp;1</span>
 
 <!-- Body / label text -->
@@ -176,14 +182,14 @@ Defined in `src/app/globals.css` `@layer utilities`. All have `.dark` variants.
 
 | Class | What it does | Typical use |
 |---|---|---|
-| `.gradient-brand` | `135deg` turf → kit navy | Primary CTAs |
+| `.gradient-brand` | `135deg` navy → teal | Primary CTAs |
 | `.gradient-text` | Same gradient clipped to text | App name, accent headings |
-| `.gradient-hero` | Two-blob floodlight + turf radial mesh wash | Landing hero, team page header |
+| `.gradient-hero` | Two-blob floodlight + navy radial mesh wash | Landing hero, team page header |
 | `.bg-pitch-lines` | Faint halfway-line + center-circle watermark | Hero/team-header backdrops — texture, not a graphic |
 | `.bg-grain` | Subtle film-grain overlay (apply to a `relative` ancestor) | Paired with `.gradient-hero` for a dusk-kickoff feel |
 | `.glass` | `backdrop-blur(16px)` + semi-transparent bg + border | Floating headers, sticky timeline "next action" bar |
 | `.shadow-glow` | `var(--shadow-glow)` | Highlighted elements, active/selected states |
-| `.shadow-glow-navy` | `var(--shadow-glow-navy)` | Admin-only actions, secondary emphasis |
+| `.shadow-glow-accent` | `var(--shadow-glow-accent)` | Admin-only actions, secondary emphasis |
 | `.shadow-glow-floodlight` | `var(--shadow-glow-floodlight)` | Next-match card, floodlight-themed highlights |
 | `.ticket-seam` + `.ticket-notch` | Dashed seam + punched circle notches | Past-result timeline cards — a torn ticket-stub motif |
 
@@ -191,7 +197,7 @@ Defined in `src/app/globals.css` `@layer utilities`. All have `.dark` variants.
 
 `<AmbientBackground />` (`src/components/layout/AmbientBackground.tsx`) is mounted once in the
 root `[locale]` layout, fixed behind everything: paints `--background` and four soft blurred
-turf/floodlight/navy blobs. `body` itself no longer paints a background color — that's this
+navy/floodlight/teal blobs. `body` itself no longer paints a background color — that's this
 component's job — so any page section without its own opaque background (Card, `.glass`, etc.
 still set their own) lets the ambient shapes show through.
 
@@ -232,7 +238,7 @@ outer primitive:
 ```
 
 ```tsx
-<Button>Follow team</Button>                        // pitch-green fill
+<Button>Follow team</Button>                        // navy fill
 <Button variant="outline">Unfollow</Button>          // bordered
 <Button variant="ghost">Cancel</Button>              // text-only
 <Button variant="destructive">Remove admin</Button>  // red
@@ -281,6 +287,11 @@ type FormValues = z.infer<typeof schema>;
 ---
 
 ## Cards (UI containers)
+
+`<Card>` gets a `ring-border` edge plus a resting `shadow-sm` for elevation — the page background
+and `--card` are perceptually very close (a deliberate "paper on chalk"/"elevated ink" look), so
+without a visible border + shadow, cards read as flush with the ambient background instead of as
+distinct surfaces. Don't drop the shadow/ring when customizing a card variant.
 
 shadcn `<Card>` for content panels and data blocks:
 
@@ -498,7 +509,7 @@ Active namespaces (this phase): `common`, `nav`, `auth`, `profile`. Reserved for
   ```
 - Form fields: always paired with `<Label>` — no placeholder-only inputs.
 - Decorative icons/emoji: `aria-hidden="true"`.
-- Color contrast: primary pitch green (`oklch(0.62 0.15 152)`) on white and on dark backgrounds
+- Color contrast: primary navy (`oklch(0.56 0.17 250)`) on white and on dark backgrounds
   meets WCAG AA; verify any team-brand override color independently since it's user-supplied
   (SRS NFR-6) — fall back to app default if a team's color fails a contrast check against text.
 - Youth privacy is an accessibility *and* safety concern: `YouthPrivacyBadge` must have a

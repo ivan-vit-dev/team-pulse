@@ -13,6 +13,14 @@ const ACTION_TYPE_VAR: Record<ActionType, string> = {
   other: "--action-other",
 };
 
+const ACTION_TYPE_FOREGROUND_VAR: Record<ActionType, string> = {
+  match: "--action-match-foreground",
+  training: "--action-training-foreground",
+  tournament: "--action-tournament-foreground",
+  cup: "--action-cup-foreground",
+  other: "--action-other-foreground",
+};
+
 export function ActionTypeBadge({
   type,
   className,
@@ -22,6 +30,7 @@ export function ActionTypeBadge({
 }) {
   const t = useTranslations("actions");
   const cssVar = ACTION_TYPE_VAR[type];
+  const foregroundVar = ACTION_TYPE_FOREGROUND_VAR[type];
 
   return (
     <span
@@ -31,7 +40,7 @@ export function ActionTypeBadge({
       )}
       style={{
         backgroundColor: `color-mix(in oklch, var(${cssVar}) 18%, transparent)`,
-        color: `var(${cssVar})`,
+        color: `var(${foregroundVar})`,
       }}
     >
       {t(`type.${type}`)}

@@ -1,5 +1,5 @@
 // Fixed, viewport-relative backdrop: paints the base --background color and
-// a handful of soft blurred turf/floodlight/navy shapes behind everything.
+// a handful of soft blurred navy/floodlight/teal shapes behind everything.
 // Deliberately fixed (not absolute down the page) so it reads as constant
 // atmosphere regardless of how long any given page is.
 export function AmbientBackground() {

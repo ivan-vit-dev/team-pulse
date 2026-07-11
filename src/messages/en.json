@@ -14,7 +14,8 @@
     "login": "Log in",
     "register": "Register",
     "logout": "Log out",
-    "toggleTheme": "Toggle theme"
+    "toggleTheme": "Toggle theme",
+    "openMenu": "Open menu"
   },
   "auth": {
     "loginTitle": "Log in to TeamPulse",
@@ -71,10 +72,17 @@
     "twitter": "Twitter / X",
     "noTeamsYet": "You don't administer any teams yet.",
     "browseTeams": "Teams",
+    "browseDescription": "Discover every team on TeamPulse — browse by club, category, or location, and follow the teams you support to stay close to their season.",
+    "searchPlaceholder": "Search by team, club, or category…",
     "noTeamsAtAll": "No teams have been created yet.",
+    "noTeamsMatchSearch": "No teams match your search.",
     "follow": "Follow",
     "following": "Following",
+    "followGateMessage": "Follow this team to see their season timeline — matches, trainings, and results.",
+    "followGateMessageLoggedOut": "Sign in and follow this team to see their season timeline — matches, trainings, and results.",
+    "signInToFollow": "Sign in",
     "adminDashboard": "Admin dashboard",
+    "youManageThisTeam": "Your team",
     "viewTeamPage": "View team page",
     "teamInfo": "Team info",
     "admins": "Admins",
@@ -184,7 +192,25 @@
     "title": "Your feed",
     "noFollowedTeams": "You're not following any teams yet.",
     "discoverTeams": "Discover teams",
-    "noUpcomingActions": "No upcoming actions."
+    "noUpcomingActions": "No upcoming actions.",
+    "heroEyebrow": "Every matchday, pitch-side",
+    "heroTitleLine1": "Your team.",
+    "heroTitleLine2": "Every match.",
+    "heroSubtitle": "Follow your team's season — matches, trainings, and the moments that matter.",
+    "heroDescription": "TeamPulse connects fans, parents, and supporters directly with amateur and youth football clubs. Team admins publish the season as it happens, so you always know what's next and what just happened.",
+    "featureTimelineTitle": "Live season timeline",
+    "featureTimelineDescription": "Every match, training, and tournament in one scrolling feed.",
+    "featureCommunityTitle": "Built for the whole club",
+    "featureCommunityDescription": "Admins publish, fans and parents follow — everyone stays close to the team.",
+    "featurePrivacyTitle": "Youth privacy, by design",
+    "featurePrivacyDescription": "Junior players get pseudonyms and protected profiles, always.",
+    "recentTeamsEyebrow": "Newest arrivals",
+    "recentTeamsTitle": "Last registered teams",
+    "seeAllTeams": "See all teams",
+    "searchTeamsPlaceholder": "Search by club name…",
+    "noTeamsFound": "No teams match your search.",
+    "noTeamsYet": "No teams have registered yet.",
+    "viewTeam": "View {name}"
   },
   "comments": {
     "title": "Comments",
@@ -205,5 +231,34 @@
     "delete": "Delete",
     "confirmDeleteTitle": "Delete this photo?",
     "confirmDeleteDescription": "This action cannot be undone."
+  },
+  "reports": {
+    "report": "Report",
+    "reportSubmitted": "Report submitted. Thanks for letting us know.",
+    "reasonLabel": "Reason",
+    "detailsLabel": "Additional details (optional)",
+    "detailsPlaceholder": "Anything else the team's admins should know…",
+    "submit": "Submit report",
+    "reason": {
+      "spam": "Spam",
+      "harassment": "Harassment or abuse",
+      "inappropriate_content": "Inappropriate content",
+      "impersonation": "Impersonation",
+      "other": "Other"
+    },
+    "contentType": {
+      "comment": "Comment",
+      "media": "Photo",
+      "team": "Team",
+      "player": "Player"
+    },
+    "title": "Reports",
+    "noPendingReports": "No pending reports.",
+    "contentUnavailable": "Content no longer available",
+    "dismiss": "Dismiss",
+    "removeContent": "Remove content",
+    "resolve": "Mark resolved",
+    "confirmRemoveTitle": "Remove this content?",
+    "confirmRemoveDescription": "This action cannot be undone."
   }
 }

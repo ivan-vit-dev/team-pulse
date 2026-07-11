@@ -79,6 +79,7 @@ export default async function ActionDetailPage({
         <ActionMediaGallery
           media={media.map((item) => omit(item, "createdAt"))}
           isTeamAdmin={isAdmin}
+          currentUid={user?.uid ?? null}
         />
       </div>
 

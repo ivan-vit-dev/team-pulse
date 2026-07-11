@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Anton, Barlow_Condensed, Figtree } from "next/font/google";
+import { Roboto, Roboto_Condensed } from "next/font/google";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -13,21 +13,24 @@ import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
-const fontSans = Figtree({
+const fontSans = Roboto({
   variable: "--font-sans",
+  weight: ["400", "500", "700"],
   subsets: ["latin", "latin-ext"],
 });
 
-const fontDisplay = Barlow_Condensed({
+const fontDisplay = Roboto({
   variable: "--font-display",
-  weight: ["600", "700"],
+  weight: ["400", "500", "700"],
   subsets: ["latin", "latin-ext"],
 });
 
 // Used sparingly — hero headlines and scoreline numerals only, never body text.
-const fontImpact = Anton({
+// Roboto Condensed rather than an unrelated display face, so headlines still
+// read as part of the same Roboto family as the rest of the UI.
+const fontImpact = Roboto_Condensed({
   variable: "--font-impact",
-  weight: "400",
+  weight: "700",
   subsets: ["latin", "latin-ext"],
 });
 

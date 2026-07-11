@@ -17,9 +17,13 @@ import {
   getComment,
   setCommentPinned,
 } from "@/lib/comments/comment-repository";
+import { getMedia } from "@/lib/media/media-repository";
+import { getPlayerPublic } from "@/lib/players/player-repository";
+import { createReport } from "@/lib/reports/report-repository";
 import { getTeam, isTeamAdmin } from "@/lib/teams/team-repository";
 import type { Action } from "@/lib/types/action";
 import type { Comment } from "@/lib/types/comment";
+import type { ReportContentType } from "@/lib/types/report";
 import { followTeam, getUserProfile, unfollowTeam } from "@/lib/users/user-repository";
 import { omit } from "@/lib/utils/omit";
 
@@ -120,4 +124,63 @@ export async function unpinCommentAction(commentId: string): Promise<void> {
   if (!comment) throw new Error("Comment not found");
   if (!(await isTeamAdmin(comment.teamId, uid))) throw new Error("Not an admin of this team");
   await setCommentPinned(commentId, false);
+}
+
+const reportContentTypeSchema = z.enum(["comment", "media", "team", "player"]);
+const reportReasonSchema = z.enum([
+  "spam",
+  "harassment",
+  "inappropriate_content",
+  "impersonation",
+  "other",
+]);
+const reportInputSchema = z.object({
+  reason: reportReasonSchema,
+  details: z.string().trim().max(500).optional(),
+});
+
+async function resolveTeamIdForReportedContent(
+  contentType: ReportContentType,
+  contentId: string,
+): Promise<string | null> {
+  switch (contentType) {
+    case "comment":
+      return (await getComment(contentId))?.teamId ?? null;
+    case "media":
+      return (await getMedia(contentId))?.teamId ?? null;
+    case "player":
+      return (await getPlayerPublic(contentId))?.teamId ?? null;
+    case "team":
+      return (await getTeam(contentId))?.id ?? null;
+  }
+}
+
+/**
+ * teamId is intentionally NOT a parameter here — trusting a client-supplied
+ * teamId would let a caller file a report that displays under a team it
+ * doesn't actually belong to. The real owning team is looked up server-side
+ * from the reported content's own record instead, the same pattern
+ * updatePlayerAction/deletePlayerAction use in admin/actions.ts.
+ */
+export async function reportContentAction(
+  contentType: z.infer<typeof reportContentTypeSchema>,
+  contentId: string,
+  input: z.infer<typeof reportInputSchema>,
+): Promise<{ reportId: string }> {
+  const uid = await requireUid();
+  const parsedType = reportContentTypeSchema.parse(contentType);
+  const { reason, details } = reportInputSchema.parse(input);
+
+  const teamId = await resolveTeamIdForReportedContent(parsedType, contentId);
+  if (!teamId) throw new Error("Content not found");
+
+  const reportId = await createReport({
+    contentType: parsedType,
+    contentId,
+    teamId,
+    reporterUid: uid,
+    reason,
+    details: details && details.length > 0 ? details : null,
+  });
+  return { reportId };
 }

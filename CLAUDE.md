@@ -137,10 +137,15 @@ the protected group). Route groups don't add URL segments, so both contribute to
 - `players/{playerId}` (public fields) + `players/{playerId}/private/profile` (admin-only real
   name/birthdate) — **implemented**. See "Youth privacy" below — this split is load-bearing, not
   a style choice.
-- `seasons`, `actions`, `comments`, `media`, `reports` — **reserved**. `firestore.rules` has
-  permissive placeholder rules for each with a `// TODO Phase "...":` comment naming the real
-  access-control rule that phase will add. Don't tighten these ad hoc without also implementing
-  the corresponding feature — check the roadmap below first.
+- `seasons`, `actions`, `comments`, `media` — **implemented**. Real `isTeamAdmin`-gated
+  `firestore.rules`, not placeholders.
+- `reports/{reportId}` — **implemented**. Reportable content: comments, media, teams, players.
+  Team-scoped, not a platform-wide moderator role — a team's own `adminUids` review and
+  resolve/dismiss/remove reports filed against that team's own content. See
+  `src/lib/reports/report-repository.ts`, `reportContentAction` in
+  `src/app/[locale]/teams/[teamId]/actions.ts`, and
+  `resolveReportAction`/`dismissReportAction`/`removeReportedContentAction` in
+  `src/app/[locale]/(app)/teams/[teamId]/admin/actions.ts`.
 
 ## Youth privacy (SRS §8 — implemented for Players; must inform all future work too)
 
@@ -160,7 +165,8 @@ Any future Comment/Media/Timeline work that surfaces a player must reuse `Player
 4. **Follow System** — real `followedTeamIds`, personalized timeline (currently always `[]`)
 5. **Comments/Media/Reactions** — engagement layer, needs youth-privacy-aware moderation hooks
 6. **Notifications** — likely where Cloud Functions actually get introduced (fan-out)
-7. **Moderation Console** — reports/content removal, builds on the `role` field on `UserProfile`
+7. ~~**Moderation Console**~~ — done: reports (comments/media/teams/players), resolved by a
+   team's own admins via the existing `adminUids` mechanism — no platform-wide moderator role
 
 ## Dev commands
 

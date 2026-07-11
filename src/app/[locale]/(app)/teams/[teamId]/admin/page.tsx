@@ -6,6 +6,7 @@ import { AdminList, type AdminSummary } from "@/components/teams/AdminList";
 import { EditTeamForm } from "@/components/teams/EditTeamForm";
 import { InviteAdminForm } from "@/components/teams/InviteAdminForm";
 import { PendingInvitesList } from "@/components/teams/PendingInvitesList";
+import { ReportsAdminList, type ReportSummary } from "@/components/reports/ReportsAdminList";
 import { SeasonAdminList } from "@/components/seasons/SeasonAdminList";
 import { SeasonSwitcher } from "@/components/seasons/SeasonSwitcher";
 import { TeamLogoUploader } from "@/components/teams/TeamLogoUploader";
@@ -16,6 +17,8 @@ import { Link } from "@/i18n/navigation";
 import { listActionsForSeason } from "@/lib/actions/action-repository";
 import { requireUid } from "@/lib/auth/require-uid";
 import { listPlayersForTeamWithPrivate } from "@/lib/players/player-repository";
+import { buildReportPreview } from "@/lib/reports/report-preview";
+import { listReportsForTeam } from "@/lib/reports/report-repository";
 import { listSeasonsForTeam } from "@/lib/seasons/season-repository";
 import { listInvitesForTeam } from "@/lib/teams/admin-invite-repository";
 import { getTeam, isTeamAdmin } from "@/lib/teams/team-repository";
@@ -38,15 +41,33 @@ export default async function TeamAdminPage({
     notFound();
   }
 
-  const [t, ts, ta, adminProfiles, invites, players, seasons] = await Promise.all([
+  const [t, ts, ta, tr, adminProfiles, invites, players, seasons, reports] = await Promise.all([
     getTranslations("teams"),
     getTranslations("seasons"),
     getTranslations("actions"),
+    getTranslations("reports"),
     Promise.all(team.adminUids.map((adminUid) => getUserProfile(adminUid))),
     listInvitesForTeam(teamId),
     listPlayersForTeamWithPrivate(teamId),
     listSeasonsForTeam(teamId),
+    listReportsForTeam(teamId),
   ]);
+
+  const pendingReports = reports.filter((report) => report.status === "pending");
+  const reportSummaries: ReportSummary[] = await Promise.all(
+    pendingReports.map(async (report) => {
+      const preview = await buildReportPreview(teamId, report);
+      return {
+        id: report.id,
+        contentType: report.contentType,
+        reason: report.reason,
+        details: report.details,
+        createdAt: report.createdAt.toDate().toISOString(),
+        previewLabel: preview.label,
+        previewHref: preview.href,
+      };
+    }),
+  );
 
   const admins: AdminSummary[] = team.adminUids.map((adminUid, i) => ({
     uid: adminUid,
@@ -138,6 +159,15 @@ export default async function TeamAdminPage({
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <h2 className="font-display text-lg font-bold">{tr("title")}</h2>
+        </CardHeader>
+        <CardContent>
+          <ReportsAdminList reports={reportSummaries} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">

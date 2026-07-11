@@ -9,6 +9,7 @@ import {
   updateAction as updateActionRepo,
 } from "@/lib/actions/action-repository";
 import { requireUid } from "@/lib/auth/require-uid";
+import { deleteComment } from "@/lib/comments/comment-repository";
 import { createMedia, deleteMedia, getMedia } from "@/lib/media/media-repository";
 import {
   getPlayerPublic,
@@ -18,6 +19,11 @@ import {
   updatePlayer as updatePlayerRepo,
   updatePlayerAvatar as updatePlayerAvatarRepo,
 } from "@/lib/players/player-repository";
+import {
+  dismissReport,
+  getReport,
+  resolveReport,
+} from "@/lib/reports/report-repository";
 import {
   createSeason as createSeasonRepo,
   deleteSeason as deleteSeasonRepo,
@@ -270,4 +276,44 @@ export async function deleteMediaAction(mediaId: string): Promise<void> {
   if (!media) throw new Error("Media not found");
   await requireTeamAdmin(media.teamId);
   await deleteMedia(mediaId);
+}
+
+export async function dismissReportAction(reportId: string): Promise<void> {
+  const report = await getReport(reportId);
+  if (!report) throw new Error("Report not found");
+  const uid = await requireTeamAdmin(report.teamId);
+  await dismissReport(reportId, uid);
+}
+
+/** Only path available for contentType === "team" — see removeReportedContentAction. */
+export async function resolveReportAction(reportId: string): Promise<void> {
+  const report = await getReport(reportId);
+  if (!report) throw new Error("Report not found");
+  const uid = await requireTeamAdmin(report.teamId);
+  await resolveReport(reportId, uid, "none");
+}
+
+export async function removeReportedContentAction(reportId: string): Promise<void> {
+  const report = await getReport(reportId);
+  if (!report) throw new Error("Report not found");
+  const uid = await requireTeamAdmin(report.teamId);
+
+  switch (report.contentType) {
+    case "comment":
+      await deleteComment(report.contentId);
+      break;
+    case "media":
+      await deleteMedia(report.contentId);
+      break;
+    case "player":
+      await deletePlayerRepo(report.contentId);
+      break;
+    case "team":
+      // No "delete team" capability exists anywhere in the app — team-repository.ts
+      // has no deleteTeam(), and firestore.rules hard-codes `allow delete: if
+      // false` on teams/{teamId}. The UI must never offer Remove for team
+      // reports, only Dismiss/Resolve.
+      throw new Error("Removing a team is not supported; use resolveReportAction instead");
+  }
+  await resolveReport(reportId, uid, "content_removed");
 }

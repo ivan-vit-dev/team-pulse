@@ -116,17 +116,21 @@ service cloud.firestore {
       allow delete: if isTeamAdmin(resource.data.teamId);
     }
 
-    // --- Reserved for later phases ---
-    // Rules below are permissive placeholders (any signed-in user may
-    // read/write) so the collections are usable in development, but they do
-    // NOT reflect final access control. Each is annotated with the phase
-    // that will replace it with real rules — see APP_DESIGN.md / CLAUDE.md
-    // phase roadmap.
-
-    // TODO Phase "Moderation": create allowed by any signed-in user,
-    // read/update/delete restricted to platform moderators only.
+    // Report mutations all go through Server Actions using firebase-admin
+    // (bypasses these rules) — see src/lib/reports/, reportContentAction in
+    // src/app/[locale]/teams/[teamId]/actions.ts, and
+    // resolveReportAction/dismissReportAction/removeReportedContentAction in
+    // src/app/[locale]/(app)/teams/[teamId]/admin/actions.ts. Defense-in-depth
+    // only, same as every other collection above. Deliberately no
+    // platform-wide moderator role — a team's own adminUids moderate reports
+    // against that team's own content (comments/media/players/the team itself).
     match /reports/{reportId} {
-      allow read, write: if isSignedIn();
+      allow read: if isTeamAdmin(resource.data.teamId) ||
+        (isSignedIn() && request.auth.uid == resource.data.reporterUid);
+      allow create: if isSignedIn()
+        && request.auth.uid == request.resource.data.reporterUid
+        && request.resource.data.status == "pending";
+      allow update, delete: if isTeamAdmin(resource.data.teamId);
     }
   }
 }

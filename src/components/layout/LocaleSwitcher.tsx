@@ -30,9 +30,9 @@ export function LocaleSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="outline" size="sm" aria-label="Language">
+          <Button variant="outline" size="sm" aria-label="Language" className="px-2 sm:px-2.5">
             <Globe className="h-4 w-4" />
-            <span className="mr-1">{current.flag}</span>
+            <span className="hidden sm:mr-1 sm:inline">{current.flag}</span>
             <span className="hidden sm:inline">{current.name}</span>
           </Button>
         }

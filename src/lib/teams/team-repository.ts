@@ -50,7 +50,12 @@ export async function listTeamsForAdmin(uid: string): Promise<Team[]> {
 }
 
 export async function listAllTeams(): Promise<Team[]> {
-  const snapshot = await teamsCollection.get();
+  const snapshot = await teamsCollection.orderBy("createdAt", "desc").get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Team);
+}
+
+export async function listRecentTeams(limit: number): Promise<Team[]> {
+  const snapshot = await teamsCollection.orderBy("createdAt", "desc").limit(limit).get();
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Team);
 }
 

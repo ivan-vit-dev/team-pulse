@@ -2,7 +2,6 @@ import { ActionTypeBadge } from "@/components/actions/ActionTypeBadge";
 import { SquadChips, type ClientSafePlayer } from "@/components/timeline/SquadChips";
 import { LikeButton } from "@/components/timeline/LikeButton";
 import { Link } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
 import type { Action } from "@/lib/types/action";
 
 type ClientSafeAction = Omit<Action, "createdAt" | "updatedAt">;
@@ -26,37 +25,27 @@ export function ActionCard({
   commentsLabel,
   nextLabel,
 }: ActionCardProps) {
+  const tileBackground =
+    variant === "next"
+      ? "var(--timeline-next-bg)"
+      : variant === "past"
+        ? "var(--timeline-past-bg)"
+        : variant === "upcoming"
+          ? "var(--timeline-upcoming-bg)"
+          : undefined;
+
   return (
     <div
-      className={cn(
-        "animate-timeline-in relative space-y-2 rounded-xl border border-border bg-card p-4",
-        variant === "next" && "animate-pulse-next overflow-hidden",
-      )}
-      style={{
-        boxShadow: variant === "next" ? "var(--timeline-next-ring)" : undefined,
-        opacity: variant === "past" ? "var(--timeline-past-opacity)" : undefined,
-        filter: variant === "upcoming" ? "var(--timeline-upcoming-filter)" : undefined,
-      }}
+      className="animate-timeline-in relative space-y-2 rounded-xl border border-border p-4"
+      style={{ background: tileBackground ?? "var(--card)" }}
     >
-      {variant === "next" && (
-        <>
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-[1]"
-            style={{
-              background:
-                "radial-gradient(120% 140% at 0% 0%, color-mix(in oklch, var(--floodlight) 16%, transparent), transparent 60%)",
-            }}
-          />
-          {nextLabel && (
-            <span
-              className="font-display text-xs font-bold uppercase tracking-wider"
-              style={{ color: "var(--floodlight)" }}
-            >
-              {nextLabel}
-            </span>
-          )}
-        </>
+      {variant === "next" && nextLabel && (
+        <span
+          className="font-display text-xs font-bold uppercase tracking-wider"
+          style={{ color: "var(--floodlight)" }}
+        >
+          {nextLabel}
+        </span>
       )}
       {variant === "past" && (
         <>

@@ -14,7 +14,8 @@
     "login": "Přihlásit se",
     "register": "Registrovat se",
     "logout": "Odhlásit se",
-    "toggleTheme": "Přepnout téma"
+    "toggleTheme": "Přepnout téma",
+    "openMenu": "Otevřít menu"
   },
   "auth": {
     "loginTitle": "Přihlášení do TeamPulse",
@@ -71,10 +72,17 @@
     "twitter": "Twitter / X",
     "noTeamsYet": "Zatím nespravujete žádný tým.",
     "browseTeams": "Týmy",
+    "browseDescription": "Objevte všechny týmy na TeamPulse — procházejte podle klubu, kategorie nebo lokality a sledujte týmy, které vás zajímají, abyste byli u jejich sezóny.",
+    "searchPlaceholder": "Hledat podle týmu, klubu nebo kategorie…",
     "noTeamsAtAll": "Zatím nebyl vytvořen žádný tým.",
+    "noTeamsMatchSearch": "Žádné týmy neodpovídají hledání.",
     "follow": "Sledovat",
     "following": "Sledováno",
+    "followGateMessage": "Sledujte tento tým a uvidíte časovou osu jeho sezóny — zápasy, tréninky a výsledky.",
+    "followGateMessageLoggedOut": "Přihlaste se a sledujte tento tým, abyste viděli časovou osu jeho sezóny — zápasy, tréninky a výsledky.",
+    "signInToFollow": "Přihlásit se",
     "adminDashboard": "Správa týmu",
+    "youManageThisTeam": "Váš tým",
     "viewTeamPage": "Zobrazit stránku týmu",
     "teamInfo": "Informace o týmu",
     "admins": "Správci",
@@ -184,7 +192,25 @@
     "title": "Váš přehled",
     "noFollowedTeams": "Zatím nesledujete žádné týmy.",
     "discoverTeams": "Objevit týmy",
-    "noUpcomingActions": "Žádné nadcházející akce."
+    "noUpcomingActions": "Žádné nadcházející akce.",
+    "heroEyebrow": "Každý zápas, na hřišti s vámi",
+    "heroTitleLine1": "Váš tým.",
+    "heroTitleLine2": "Každý zápas.",
+    "heroSubtitle": "Sledujte sezónu vašeho týmu — zápasy, tréninky a chvíle, na kterých záleží.",
+    "heroDescription": "TeamPulse propojuje fanoušky, rodiče a příznivce přímo s amatérskými a mládežnickými fotbalovými kluby. Administrátoři týmu publikují sezónu tak, jak se odehrává, takže vždy víte, co bude následovat a co se právě stalo.",
+    "featureTimelineTitle": "Živá časová osa sezóny",
+    "featureTimelineDescription": "Všechny zápasy, tréninky a turnaje v jednom přehledném feedu.",
+    "featureCommunityTitle": "Pro celý klub",
+    "featureCommunityDescription": "Administrátoři publikují, fanoušci a rodiče sledují — všichni zůstávají v obraze.",
+    "featurePrivacyTitle": "Soukromí mládeže na prvním místě",
+    "featurePrivacyDescription": "Mladí hráči mají pseudonymy a chráněné profily, vždy.",
+    "recentTeamsEyebrow": "Nejnovější přírůstky",
+    "recentTeamsTitle": "Naposledy registrované týmy",
+    "seeAllTeams": "Zobrazit všechny týmy",
+    "searchTeamsPlaceholder": "Hledat podle názvu klubu…",
+    "noTeamsFound": "Žádné týmy neodpovídají hledání.",
+    "noTeamsYet": "Zatím se neregistroval žádný tým.",
+    "viewTeam": "Zobrazit {name}"
   },
   "comments": {
     "title": "Komentáře",
@@ -205,5 +231,34 @@
     "delete": "Smazat",
     "confirmDeleteTitle": "Smazat tuto fotku?",
     "confirmDeleteDescription": "Tuto akci nelze vrátit zpět."
+  },
+  "reports": {
+    "report": "Nahlásit",
+    "reportSubmitted": "Nahlášení odesláno. Děkujeme za upozornění.",
+    "reasonLabel": "Důvod",
+    "detailsLabel": "Další podrobnosti (nepovinné)",
+    "detailsPlaceholder": "Cokoliv dalšího, co by měli správci týmu vědět…",
+    "submit": "Odeslat nahlášení",
+    "reason": {
+      "spam": "Spam",
+      "harassment": "Obtěžování nebo zneužívání",
+      "inappropriate_content": "Nevhodný obsah",
+      "impersonation": "Vydávání se za někoho jiného",
+      "other": "Jiné"
+    },
+    "contentType": {
+      "comment": "Komentář",
+      "media": "Fotka",
+      "team": "Tým",
+      "player": "Hráč"
+    },
+    "title": "Nahlášení",
+    "noPendingReports": "Žádná čekající nahlášení.",
+    "contentUnavailable": "Obsah již není k dispozici",
+    "dismiss": "Zamítnout",
+    "removeContent": "Odstranit obsah",
+    "resolve": "Označit za vyřešené",
+    "confirmRemoveTitle": "Odstranit tento obsah?",
+    "confirmRemoveDescription": "Tuto akci nelze vrátit zpět."
   }
 }

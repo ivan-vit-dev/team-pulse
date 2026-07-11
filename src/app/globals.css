@@ -48,6 +48,11 @@
   --color-action-tournament: var(--action-tournament);
   --color-action-cup: var(--action-cup);
   --color-action-other: var(--action-other);
+  --color-action-match-foreground: var(--action-match-foreground);
+  --color-action-training-foreground: var(--action-training-foreground);
+  --color-action-tournament-foreground: var(--action-tournament-foreground);
+  --color-action-cup-foreground: var(--action-cup-foreground);
+  --color-action-other-foreground: var(--action-other-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -57,10 +62,10 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Turf / Floodlight / Kit Navy palette — see APP_DESIGN.md.
-   "Matchday, under lights": a deeper, more saturated pitch green,
-   a warm sodium-floodlight gold, and a proper red-card red — dusk
-   kick-off, not a SaaS dashboard. */
+/* Navy / Teal / Floodlight palette — see APP_DESIGN.md.
+   "Matchday, under lights": a deep royal navy paired with a vivid teal
+   accent, a warm sodium-floodlight gold, and a proper red-card red —
+   dusk kick-off, not a SaaS dashboard. */
 :root {
   --background: oklch(0.975 0.006 95);
   --foreground: oklch(0.16 0.02 250);
@@ -68,29 +73,29 @@
   --card-foreground: oklch(0.16 0.02 250);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.16 0.02 250);
-  --primary: oklch(0.56 0.17 152);
-  --primary-foreground: oklch(0.99 0.005 152);
-  --secondary: oklch(0.93 0.015 152);
-  --secondary-foreground: oklch(0.28 0.05 152);
+  --primary: oklch(0.56 0.17 250);
+  --primary-foreground: oklch(0.99 0.005 250);
+  --secondary: oklch(0.93 0.015 250);
+  --secondary-foreground: oklch(0.28 0.05 250);
   --muted: oklch(0.93 0.006 250);
   --muted-foreground: oklch(0.48 0.02 250);
   --accent: oklch(0.91 0.02 250);
   --accent-foreground: oklch(0.22 0.06 250);
-  --brand-accent: oklch(0.42 0.15 250);
+  --brand-accent: oklch(0.42 0.15 195);
   --floodlight: oklch(0.74 0.15 75);
   --floodlight-foreground: oklch(0.24 0.05 75);
   --destructive: oklch(0.577 0.245 27);
-  --border: oklch(0.89 0.008 250);
+  --border: oklch(0.80 0.014 250);
   --input: oklch(0.89 0.008 250);
-  --ring: oklch(0.56 0.17 152);
-  --chart-1: oklch(0.56 0.17 152);
-  --chart-2: oklch(0.42 0.15 250);
+  --ring: oklch(0.56 0.17 250);
+  --chart-1: oklch(0.56 0.17 250);
+  --chart-2: oklch(0.42 0.15 195);
   --chart-3: oklch(0.74 0.15 75);
   --chart-4: oklch(0.55 0.20 300);
   --chart-5: oklch(0.60 0.19 25);
   --radius: 0.75rem;
-  --shadow-glow: 0 0 24px oklch(0.56 0.17 152 / 0.30);
-  --shadow-glow-navy: 0 0 24px oklch(0.42 0.15 250 / 0.30);
+  --shadow-glow: 0 0 24px oklch(0.56 0.17 250 / 0.30);
+  --shadow-glow-accent: 0 0 24px oklch(0.42 0.15 195 / 0.30);
   --shadow-glow-floodlight: 0 0 28px oklch(0.74 0.15 75 / 0.35);
 
   --action-match: oklch(0.60 0.19 25);
@@ -99,11 +104,27 @@
   --action-cup: oklch(0.55 0.20 300);
   --action-other: oklch(0.65 0.01 250);
 
-  --timeline-past-opacity: 1;
-  --timeline-upcoming-filter: grayscale(0.7) opacity(0.55);
-  /* Deliberately floodlight gold, not team-brand — a universal "spotlight"
-     cue that reads the same across every team's own colors. */
-  --timeline-next-ring: 0 0 0 3px var(--floodlight);
+  /* Text/icon pairing for each --action-* base color when it's used as a
+     color-mix() tint background (ActionTypeBadge). The base tokens above are
+     tuned to read well as a *solid* marker; painted directly as text over
+     their own ~18% tint they fall short of WCAG AA (as low as 2.3:1). These
+     foreground variants keep the same hue/chroma but push lightness far
+     enough to clear 4.5:1 against that tint. */
+  --action-match-foreground: oklch(0.52 0.19 25);
+  --action-training-foreground: oklch(0.47 0.14 230);
+  --action-tournament-foreground: oklch(0.52 0.14 85);
+  --action-cup-foreground: oklch(0.52 0.20 300);
+  --action-other-foreground: oklch(0.51 0.01 250);
+
+  /* Timeline action tiles are told apart by a flat background tint per
+     temporal bucket, not opacity/filter/glow — deliberately floodlight gold
+     for "next", not team-brand, so it reads the same across every team's
+     own colors. Hand-tuned per theme (not color-mix against --card) since
+     mixing across very different hues drifts toward muddy, unintended
+     colors — e.g. gold mixed into the dark navy card read as murky green. */
+  --timeline-past-bg: oklch(0.9 0.012 250);
+  --timeline-next-bg: oklch(0.9 0.1 55);
+  --timeline-upcoming-bg: oklch(0.9 0.07 250);
 
   --sidebar: oklch(0.96 0.008 250);
   --sidebar-foreground: oklch(0.14 0.02 250);
@@ -116,34 +137,34 @@
 }
 
 .dark {
-  --background: oklch(0.10 0.018 152);
-  --foreground: oklch(0.95 0.004 152);
-  --card: oklch(0.16 0.02 152);
-  --card-foreground: oklch(0.95 0.004 152);
-  --popover: oklch(0.16 0.02 152);
-  --popover-foreground: oklch(0.95 0.004 152);
-  --primary: oklch(0.72 0.19 152);
-  --primary-foreground: oklch(0.10 0.01 152);
-  --secondary: oklch(0.24 0.02 152);
-  --secondary-foreground: oklch(0.95 0.004 152);
+  --background: oklch(0.10 0.018 250);
+  --foreground: oklch(0.95 0.004 250);
+  --card: oklch(0.19 0.02 250);
+  --card-foreground: oklch(0.95 0.004 250);
+  --popover: oklch(0.16 0.02 250);
+  --popover-foreground: oklch(0.95 0.004 250);
+  --primary: oklch(0.72 0.19 250);
+  --primary-foreground: oklch(0.10 0.01 250);
+  --secondary: oklch(0.24 0.02 250);
+  --secondary-foreground: oklch(0.95 0.004 250);
   --muted: oklch(0.22 0.014 250);
   --muted-foreground: oklch(0.64 0.016 250);
   --accent: oklch(0.24 0.03 250);
-  --accent-foreground: oklch(0.95 0.004 152);
-  --brand-accent: oklch(0.60 0.18 250);
+  --accent-foreground: oklch(0.95 0.004 250);
+  --brand-accent: oklch(0.60 0.18 195);
   --floodlight: oklch(0.78 0.16 78);
   --floodlight-foreground: oklch(0.16 0.03 78);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 9%);
+  --border: oklch(1 0 0 / 16%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.72 0.19 152);
-  --chart-1: oklch(0.72 0.19 152);
-  --chart-2: oklch(0.60 0.18 250);
+  --ring: oklch(0.72 0.19 250);
+  --chart-1: oklch(0.72 0.19 250);
+  --chart-2: oklch(0.60 0.18 195);
   --chart-3: oklch(0.78 0.16 78);
   --chart-4: oklch(0.62 0.21 300);
   --chart-5: oklch(0.66 0.20 25);
-  --shadow-glow: 0 0 28px oklch(0.72 0.19 152 / 0.35);
-  --shadow-glow-navy: 0 0 28px oklch(0.60 0.18 250 / 0.35);
+  --shadow-glow: 0 0 28px oklch(0.72 0.19 250 / 0.35);
+  --shadow-glow-accent: 0 0 28px oklch(0.60 0.18 195 / 0.35);
   --shadow-glow-floodlight: 0 0 32px oklch(0.78 0.16 78 / 0.40);
 
   --action-match: oklch(0.66 0.20 25);
@@ -152,12 +173,22 @@
   --action-cup: oklch(0.62 0.21 300);
   --action-other: oklch(0.68 0.01 250);
 
+  --action-match-foreground: oklch(0.67 0.20 25);
+  --action-training-foreground: oklch(0.65 0.15 230);
+  --action-tournament-foreground: oklch(0.76 0.15 85);
+  --action-cup-foreground: oklch(0.67 0.21 300);
+  --action-other-foreground: oklch(0.68 0.01 250);
+
+  --timeline-past-bg: oklch(0.24 0.012 250);
+  --timeline-next-bg: oklch(0.4 0.14 55);
+  --timeline-upcoming-bg: oklch(0.26 0.06 250);
+
   --sidebar: oklch(0.14 0.014 250);
-  --sidebar-foreground: oklch(0.95 0.004 152);
+  --sidebar-foreground: oklch(0.95 0.004 250);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: oklch(0.24 0.03 250);
-  --sidebar-accent-foreground: oklch(0.95 0.004 152);
+  --sidebar-accent-foreground: oklch(0.95 0.004 250);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
 }
@@ -208,8 +239,8 @@
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
-  .shadow-glow-navy {
-    box-shadow: var(--shadow-glow-navy);
+  .shadow-glow-accent {
+    box-shadow: var(--shadow-glow-accent);
   }
   .shadow-glow-floodlight {
     box-shadow: var(--shadow-glow-floodlight);
@@ -267,27 +298,12 @@
   }
 }
 
-@keyframes pulse-next {
-  0%,
-  100% {
-    box-shadow: var(--timeline-next-ring);
-  }
-  50% {
-    box-shadow: 0 0 0 6px color-mix(in oklch, var(--floodlight) 40%, transparent);
-  }
-}
-
 .animate-timeline-in {
   animation: timeline-in 0.3s ease-out;
 }
 
-.animate-pulse-next {
-  animation: pulse-next 2s ease-in-out infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .animate-timeline-in,
-  .animate-pulse-next {
+  .animate-timeline-in {
     animation: none;
   }
 }

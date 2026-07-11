@@ -12,6 +12,7 @@ import {
   type ClientComment,
 } from "@/app/[locale]/teams/[teamId]/actions";
 import { CommentForm } from "@/components/comments/CommentForm";
+import { ReportButton } from "@/components/reports/ReportButton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -115,6 +116,11 @@ export function CommentList({
                   <p className="text-sm">{comment.text}</p>
                 </div>
                 <div className="flex items-center gap-1">
+                  <ReportButton
+                    contentType="comment"
+                    contentId={comment.id}
+                    isSignedIn={currentUid !== null}
+                  />
                   {isTeamAdmin && (
                     <Button
                       variant="ghost"

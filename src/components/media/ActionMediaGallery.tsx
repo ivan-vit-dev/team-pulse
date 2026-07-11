@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { deleteMediaAction } from "@/app/[locale]/(app)/teams/[teamId]/admin/actions";
+import { ReportButton } from "@/components/reports/ReportButton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,9 +26,10 @@ type ClientSafeMedia = Omit<Media, "createdAt">;
 interface ActionMediaGalleryProps {
   media: ClientSafeMedia[];
   isTeamAdmin: boolean;
+  currentUid: string | null;
 }
 
-export function ActionMediaGallery({ media, isTeamAdmin }: ActionMediaGalleryProps) {
+export function ActionMediaGallery({ media, isTeamAdmin, currentUid }: ActionMediaGalleryProps) {
   const t = useTranslations("media");
   const tc = useTranslations("common");
   const ta = useTranslations("auth");
@@ -59,6 +61,12 @@ export function ActionMediaGallery({ media, isTeamAdmin }: ActionMediaGalleryPro
             src={item.url}
             alt=""
             className="aspect-square w-full rounded-lg object-cover"
+          />
+          <ReportButton
+            contentType="media"
+            contentId={item.id}
+            isSignedIn={currentUid !== null}
+            className="absolute top-1.5 left-1.5 bg-background/70"
           />
           {isTeamAdmin && (
             <AlertDialog>
