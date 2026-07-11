@@ -11,6 +11,7 @@
     "discoverTeams": "Týmy",
     "invites": "Pozvánky",
     "settings": "Nastavení",
+    "notifications": "Oznámení",
     "login": "Přihlásit se",
     "register": "Registrovat se",
     "logout": "Odhlásit se",
@@ -260,5 +261,13 @@
     "resolve": "Označit za vyřešené",
     "confirmRemoveTitle": "Odstranit tento obsah?",
     "confirmRemoveDescription": "Tuto akci nelze vrátit zpět."
+  },
+  "notifications": {
+    "title": "Oznámení",
+    "empty": "Zatím žádná oznámení.",
+    "markAllRead": "Označit vše jako přečtené",
+    "viewAll": "Zobrazit vše",
+    "loadingMore": "Načítání dalších…",
+    "newAction": "Nové {type} — {team}"
   }
 }

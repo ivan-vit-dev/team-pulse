@@ -19,6 +19,15 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow create, update: if isSignedIn() && request.auth.uid == uid;
       allow delete: if false;
+
+      // Written only by the onActionCreated Cloud Function (admin SDK
+      // bypasses these rules) — see functions/src/index.ts. A client can read
+      // its own notifications and mark them read, never create or delete one
+      // directly (that would let a user forge/hide notifications).
+      match /notifications/{notificationId} {
+        allow read, update: if isSignedIn() && request.auth.uid == uid;
+        allow create, delete: if false;
+      }
     }
 
     // Note: this app's Team/Player/Invite mutations all go through Server

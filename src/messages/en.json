@@ -11,6 +11,7 @@
     "discoverTeams": "Teams",
     "invites": "Invites",
     "settings": "Settings",
+    "notifications": "Notifications",
     "login": "Log in",
     "register": "Register",
     "logout": "Log out",
@@ -260,5 +261,13 @@
     "resolve": "Mark resolved",
     "confirmRemoveTitle": "Remove this content?",
     "confirmRemoveDescription": "This action cannot be undone."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet.",
+    "markAllRead": "Mark all read",
+    "viewAll": "View all",
+    "loadingMore": "Loading more…",
+    "newAction": "New {type} — {team}"
   }
 }

@@ -13,17 +13,19 @@ privacy protections (pseudonym, no photo, no personal info in public views). Ful
 are in the original SRS the client provided (not checked into this repo) — this file and
 [APP_DESIGN.md](./APP_DESIGN.md) are the living reference going forward.
 
-**Only Foundation + Auth and Team Management are implemented so far** (see Phase Roadmap below).
-Don't assume season/action/timeline/follow/comment/notification/moderation features exist in
-code yet.
+**All 7 MVP phases are implemented** (see Phase Roadmap below): Foundation + Auth, Team
+Management, Seasons & Actions, Timeline, Follow System, Comments/Media/Reactions, Notifications
+(FCM push + an in-app inbox, both via the same Cloud Function), and the Moderation Console. The
+one known gap: no email notification channel yet.
 
 ## Tech stack
 
 - Next.js 16, App Router, TypeScript, Server Components for data fetching + Client Components
   for interactivity — see `AGENTS.md`/`node_modules/next/dist/docs/` before assuming an API from
   older Next.js versions still applies (e.g. `middleware.ts` was replaced by `proxy.ts`)
-- Firebase: Authentication, Firestore, Storage, Cloud Functions (not yet used), Remote Config
-  (not yet used)
+- Firebase: Authentication, Firestore, Storage, Cloud Functions (`functions/src/index.ts` —
+  `onActionCreated` trigger fans out FCM push notifications to followers), Remote Config (not
+  yet used)
 - Tailwind CSS + shadcn/ui — note shadcn here is built on **Base UI** (`@base-ui/react`), not
   Radix. Polymorphic composition uses the `render` prop, not `asChild`. See APP_DESIGN.md's
   Buttons section for the correct pattern.
@@ -90,35 +92,62 @@ src/
   lib/
     firebase/              client.ts (browser SDK), admin.ts (server-only Admin SDK)
     auth/                  session.ts, require-uid.ts, client-actions.ts
-    users/                 user-repository.ts (Firestore CRUD for users/{uid})
+    users/                 user-repository.ts (Firestore CRUD for users/{uid}; follow/unfollow,
+                           FCM token registration all live here, not a separate module)
     teams/                 team-repository.ts, admin-invite-repository.ts
     players/               player-repository.ts (public/private split), youth.ts (age threshold)
-    types/                 domain TypeScript types (user.ts, team.ts, player.ts)
+    seasons/               season-repository.ts (CRUD, setActiveSeason)
+    actions/               action-repository.ts (CRUD, paginated past/upcoming queries, likes)
+    comments/              comment-repository.ts (create/list/delete/pin)
+    media/                 media-repository.ts (create/list/delete)
+    reports/               report-repository.ts, report-preview.ts
+    notifications/         notification-repository.ts (paginated list, unread count, mark read)
+    types/                 domain TypeScript types (user.ts, team.ts, player.ts, action.ts, ...)
     utils/                 cn.ts, firebase-errors.ts
   hooks/useAuth.ts          consumes AuthProvider's client-side auth state (UX only)
   components/
     ui/                    shadcn/Base UI primitives — do not hand-edit, re-run `shadcn add`
     auth/                  AuthProvider, LoginForm, RegisterForm, GoogleSignInButton
     layout/                Navbar, Footer, LocaleSwitcher, UserMenu
+    notifications/         NotificationBell (Navbar dropdown), NotificationList, NotificationRow
     profile/                ProfileForm, AvatarUploader, NotificationPrefsForm, FollowedTeamsList
     teams/                 CreateTeamForm, EditTeamForm, TeamLogoUploader, AdminList,
                             InviteAdminForm, PendingInvitesList, InvitesList
     players/               PlayerForm, PlayerAvatarUploader, PlayerAdminList, RosterGrid,
                             YouthPrivacyBadge
+    seasons/               SeasonForm, SeasonAdminList, SeasonSwitcher
+    actions/               ActionForm, ActionAdminList, ActionTypeBadge
+    timeline/               ActionCard, PastActionsFeed, UpcomingActionsList, SquadChips,
+                            LikeButton
+    comments/              CommentForm, CommentList
+    media/                 ActionMediaUploader, ActionMediaGallery
+    reports/               ReportButton, ReportsAdminList
+    home/                  FollowedTeamsFeed, AdminTeamsPanel (personalized signed-in home)
   app/
     api/auth/session/route.ts   session cookie mint/clear (Node runtime)
     [locale]/
       layout.tsx           fonts, NextIntlClientProvider, AuthProvider, Navbar/Footer, root <html>
-      page.tsx             landing page
-      teams/[teamId]/      PUBLIC team page (info + roster) — no auth required
+      page.tsx             landing page (signed-out) / personalized feed (signed-in)
+      teams/[teamId]/      PUBLIC team page (roster + timeline) + actions.ts (comments, likes,
+                           reports, load-more-past-actions) — no auth required to view
+        actions/[actionId]/  action detail page (comments, media, full roster)
       (auth)/              login/register — redirects away if already signed in
       (app)/               protected — redirects to /login if not signed in
         settings/          profile settings page + actions.ts
+        notifications/     in-app notification inbox page + actions.ts (get recent/load
+                           more/mark read/mark all read)
         teams/             "my teams" (admin) list, actions.ts (createTeamAction)
           new/              create-team page
-          [teamId]/admin/   admin dashboard + actions.ts (team/admin/player mutations)
+          [teamId]/admin/   admin dashboard + actions.ts (team/admin/player/season/action/media
+                            mutations, report resolve/dismiss/remove)
             players/new, players/[playerId]/edit
+            seasons/, seasons/[seasonId]/actions/new, .../actions/[actionId]/edit
         invites/           pending admin-invite accept/decline + actions.ts
+functions/
+  src/index.ts             onActionCreated Firestore trigger — fans out FCM push (respects
+                            notificationPreferences.push, prunes invalid tokens) AND writes a
+                            users/{uid}/notifications doc per follower (always-on, not
+                            preference-gated) to every follower
 ```
 
 Note the two different `teams/[teamId]` routes at different levels: the **public** team page
@@ -146,6 +175,13 @@ the protected group). Route groups don't add URL segments, so both contribute to
   `src/app/[locale]/teams/[teamId]/actions.ts`, and
   `resolveReportAction`/`dismissReportAction`/`removeReportedContentAction` in
   `src/app/[locale]/(app)/teams/[teamId]/admin/actions.ts`.
+- `users/{uid}/notifications/{notificationId}` — **implemented**. Persisted in-app inbox
+  alongside FCM push (see `functions/src/index.ts`'s `onActionCreated`, which now writes one of
+  these per follower in the same batch it sends push) — always-on, not gated by
+  `notificationPreferences.push`. Read/mark-read only by the owning user; create/delete are
+  Cloud-Function-only (`allow create, delete: if false`). See
+  `src/lib/notifications/notification-repository.ts` and
+  `src/app/[locale]/(app)/notifications/actions.ts`.
 
 ## Youth privacy (SRS §8 — implemented for Players; must inform all future work too)
 
@@ -159,14 +195,26 @@ Any future Comment/Media/Timeline work that surfaces a player must reuse `Player
 
 ## Phase Roadmap (MVP priority order)
 
-1. ~~**Team Management**~~ — done: teams, admin invites, players with youth privacy
-2. **Seasons & Actions** — matches/trainings/tournaments content model (next up)
-3. **Timeline** — fan-facing season view aggregating actions (the app's signature surface)
-4. **Follow System** — real `followedTeamIds`, personalized timeline (currently always `[]`)
-5. **Comments/Media/Reactions** — engagement layer, needs youth-privacy-aware moderation hooks
-6. **Notifications** — likely where Cloud Functions actually get introduced (fan-out)
-7. ~~**Moderation Console**~~ — done: reports (comments/media/teams/players), resolved by a
-   team's own admins via the existing `adminUids` mechanism — no platform-wide moderator role
+All 7 MVP phases below are **done**. This list is now a map of where each phase lives, not a
+to-do list — see "Repo structure" above for exact file locations.
+
+1. ~~**Team Management**~~ — teams, admin invites, players with youth privacy
+2. ~~**Seasons & Actions**~~ — matches/trainings/tournaments content model, admin CRUD
+3. ~~**Timeline**~~ — fan-facing season view aggregating actions, paginated past-actions feed
+4. ~~**Follow System**~~ — real `followedTeamIds` (`followTeam`/`unfollowTeam` in
+   `user-repository.ts`), personalized home feed (`FollowedTeamsFeed`)
+5. ~~**Comments/Media/Reactions**~~ — engagement layer (comments, media gallery, likes),
+   youth-privacy-aware (reuses `PlayerPublic`)
+6. ~~**Notifications**~~ — `onActionCreated` Cloud Function fans out both FCM push and a
+   persisted `users/{uid}/notifications` in-app inbox entry to followers (bell icon in `Navbar`,
+   full history at `/notifications`). Push preference (`notificationPreferences.push`) only gates
+   the FCM channel — the in-app inbox is always-on. **Email is still not implemented.**
+7. ~~**Moderation Console**~~ — reports (comments/media/teams/players), resolved by a team's own
+   admins via the existing `adminUids` mechanism — no platform-wide moderator role
+
+### Next up (post-MVP)
+
+- **Email notification channel** — second delivery channel alongside FCM push + the in-app inbox.
 
 ## Dev commands
 

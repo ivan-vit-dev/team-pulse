@@ -5,16 +5,20 @@ import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { MobileNavMenu } from "@/components/layout/MobileNavMenu";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { Link } from "@/i18n/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
+import { getUnreadNotificationCount } from "@/lib/notifications/notification-repository";
 
 export async function Navbar() {
   const [user, t] = await Promise.all([getCurrentUser(), getTranslations("nav")]);
+  const unreadCount = user ? await getUnreadNotificationCount(user.uid) : 0;
 
   const mobileMenuItems = user
     ? [
         { href: "/teams", label: t("discoverTeams") },
         { href: "/teams/mine", label: t("myTeams") },
+        { href: "/notifications", label: t("notifications") },
       ]
     : [
         { href: "/teams", label: t("discoverTeams") },
@@ -44,6 +48,7 @@ export async function Navbar() {
               render={<Link href="/teams/mine">{t("myTeams")}</Link>}
             />
             <MobileNavMenu items={mobileMenuItems} menuLabel={t("openMenu")} />
+            <NotificationBell initialUnreadCount={unreadCount} />
             <UserMenu displayName={user.displayName} photoURL={user.photoURL} />
           </>
         ) : (

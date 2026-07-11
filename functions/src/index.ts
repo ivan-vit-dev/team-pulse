@@ -50,34 +50,71 @@ async function pruneInvalidTokens(
   );
 }
 
-export const onActionCreated = onDocumentCreated("actions/{actionId}", async (event) => {
-  try {
-    const snapshot = event.data;
-    if (!snapshot) return;
-    const action = snapshot.data() as ActionDoc;
-
-    const followers = await db
-      .collection("users")
-      .where("followedTeamIds", "array-contains", action.teamId)
-      .get();
-
-    const tokenOwners = new Map<string, string>();
-    const tokens: string[] = [];
-    followers.docs.forEach((doc: QueryDocumentSnapshot) => {
-      if (doc.id === action.createdBy) return; // skip notifying the creator
-      const user = doc.data() as UserDoc;
-      if (!user.notificationPreferences?.push) return;
-      for (const token of user.fcmTokens ?? []) {
-        tokens.push(token);
-        tokenOwners.set(token, doc.id);
-      }
+// In-app notifications are an always-on channel, independent of the FCM push
+// opt-in above: every follower gets a persisted users/{uid}/notifications/{id}
+// doc regardless of notificationPreferences.push, so someone without (or who
+// denied) push permission still has something to check in the app.
+async function writeInAppNotifications(
+  followerUids: string[],
+  teamId: string,
+  teamName: string,
+  actionId: string,
+  action: ActionDoc,
+): Promise<void> {
+  if (followerUids.length === 0) return;
+  const batch = db.batch();
+  for (const uid of followerUids) {
+    const ref = db.collection("users").doc(uid).collection("notifications").doc();
+    batch.set(ref, {
+      type: "newAction",
+      teamId,
+      teamName,
+      actionId,
+      actionType: action.type,
+      actionTitle: action.title,
+      isRead: false,
+      createdAt: FieldValue.serverTimestamp(),
     });
+  }
+  await batch.commit();
+}
 
-    if (tokens.length === 0) return;
+export const onActionCreated = onDocumentCreated("actions/{actionId}", async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  const action = snapshot.data() as ActionDoc;
 
-    const team = await db.collection("teams").doc(action.teamId).get();
-    const teamName = (team.data()?.name as string | undefined) ?? "TeamPulse";
+  const followers = await db
+    .collection("users")
+    .where("followedTeamIds", "array-contains", action.teamId)
+    .get();
 
+  const followerUids: string[] = [];
+  const tokenOwners = new Map<string, string>();
+  const tokens: string[] = [];
+  followers.docs.forEach((doc: QueryDocumentSnapshot) => {
+    if (doc.id === action.createdBy) return; // skip notifying the creator
+    followerUids.push(doc.id);
+    const user = doc.data() as UserDoc;
+    if (!user.notificationPreferences?.push) return;
+    for (const token of user.fcmTokens ?? []) {
+      tokens.push(token);
+      tokenOwners.set(token, doc.id);
+    }
+  });
+
+  const team = await db.collection("teams").doc(action.teamId).get();
+  const teamName = (team.data()?.name as string | undefined) ?? "TeamPulse";
+
+  try {
+    await writeInAppNotifications(followerUids, action.teamId, teamName, event.params.actionId, action);
+  } catch (err) {
+    console.error("onActionCreated: writing in-app notifications failed:", err);
+  }
+
+  if (tokens.length === 0) return;
+
+  try {
     const response = await getMessaging().sendEachForMulticast({
       tokens,
       notification: {
@@ -91,6 +128,6 @@ export const onActionCreated = onDocumentCreated("actions/{actionId}", async (ev
 
     await pruneInvalidTokens(tokens, tokenOwners, response);
   } catch (err) {
-    console.error("onActionCreated failed:", err);
+    console.error("onActionCreated: FCM push failed:", err);
   }
 });
