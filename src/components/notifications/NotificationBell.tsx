@@ -8,7 +8,6 @@ import {
   getRecentNotificationsAction,
   markAllNotificationsReadAction,
   markNotificationReadAction,
-  type ClientNotification,
 } from "@/app/[locale]/(app)/notifications/actions";
 import { NotificationRow } from "@/components/notifications/NotificationRow";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +19,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "@/i18n/navigation";
+import { notificationHref } from "@/lib/notifications/notification-href";
+import type { ClientNotification } from "@/lib/notifications/notification-repository";
 
 interface NotificationBellProps {
   initialUnreadCount: number;
@@ -99,7 +100,7 @@ export function NotificationBell({ initialUnreadCount }: NotificationBellProps) 
             key={notification.id}
             render={
               <Link
-                href={`/teams/${notification.teamId}/actions/${notification.actionId}`}
+                href={notificationHref(notification)}
                 onClick={() => handleOpenNotification(notification.id)}
               />
             }

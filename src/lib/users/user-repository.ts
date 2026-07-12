@@ -67,7 +67,21 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   if (!snapshot.exists) {
     return null;
   }
-  return snapshot.data() as UserProfile;
+  const profile = snapshot.data() as UserProfile;
+  // Docs created before per-category notification settings existed lack
+  // `categories` entirely — normalize here, the single read choke point for
+  // the web app, rather than pushing `?? true` onto every consumer.
+  return {
+    ...profile,
+    notificationPreferences: {
+      ...DEFAULT_NOTIFICATION_PREFERENCES,
+      ...profile.notificationPreferences,
+      categories: {
+        ...DEFAULT_NOTIFICATION_PREFERENCES.categories,
+        ...profile.notificationPreferences?.categories,
+      },
+    },
+  };
 }
 
 export interface UpdateUserProfileInput {

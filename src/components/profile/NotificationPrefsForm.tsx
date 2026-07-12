@@ -15,7 +15,15 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { firebaseVapidKey } from "@/lib/firebase/config";
 import { getFcmMessaging } from "@/lib/firebase/client";
-import type { NotificationPreferences } from "@/lib/types/user";
+import type { NotificationCategory, NotificationPreferences } from "@/lib/types/user";
+
+const CATEGORIES: NotificationCategory[] = [
+  "newAction",
+  "actionUpdated",
+  "adminInvite",
+  "commentReply",
+  "followInvite",
+];
 
 interface NotificationPrefsFormProps {
   preferences: NotificationPreferences;
@@ -84,25 +92,57 @@ export function NotificationPrefsForm({ preferences }: NotificationPrefsFormProp
     }
   }
 
+  async function handleCategoryChange(category: NotificationCategory, checked: boolean) {
+    const next = { ...prefs, categories: { ...prefs.categories, [category]: checked } };
+    setPrefs(next);
+    setIsSaving(true);
+    try {
+      await updateNotificationPrefsAction(next);
+      router.refresh();
+    } catch {
+      setPrefs(prefs);
+      toast.error(ta("genericError"));
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <Label htmlFor="email-notifications">{t("emailNotifications")}</Label>
-        <Switch
-          id="email-notifications"
-          checked={prefs.email}
-          disabled={isSaving}
-          onCheckedChange={(checked: boolean) => handleEmailChange(checked)}
-        />
+    <div className="space-y-4">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="email-notifications">{t("emailNotifications")}</Label>
+          <Switch
+            id="email-notifications"
+            checked={prefs.email}
+            disabled={isSaving}
+            onCheckedChange={(checked: boolean) => handleEmailChange(checked)}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="push-notifications">{t("pushNotifications")}</Label>
+          <Switch
+            id="push-notifications"
+            checked={prefs.push}
+            disabled={isSaving}
+            onCheckedChange={(checked: boolean) => handlePushChange(checked)}
+          />
+        </div>
       </div>
-      <div className="flex items-center justify-between">
-        <Label htmlFor="push-notifications">{t("pushNotifications")}</Label>
-        <Switch
-          id="push-notifications"
-          checked={prefs.push}
-          disabled={isSaving}
-          onCheckedChange={(checked: boolean) => handlePushChange(checked)}
-        />
+
+      <div className="space-y-3 border-t border-border pt-3">
+        <p className="text-sm font-medium">{t("notifyMeAbout")}</p>
+        {CATEGORIES.map((category) => (
+          <div key={category} className="flex items-center justify-between">
+            <Label htmlFor={`category-${category}`}>{t(`category.${category}`)}</Label>
+            <Switch
+              id={`category-${category}`}
+              checked={prefs.categories[category]}
+              disabled={isSaving}
+              onCheckedChange={(checked: boolean) => handleCategoryChange(category, checked)}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );

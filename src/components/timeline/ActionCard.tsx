@@ -1,7 +1,8 @@
 import { ActionTypeBadge } from "@/components/actions/ActionTypeBadge";
 import { SquadChips, type ClientSafePlayer } from "@/components/timeline/SquadChips";
-import { LikeButton } from "@/components/timeline/LikeButton";
+import { ReactionPicker } from "@/components/timeline/ReactionPicker";
 import { Link } from "@/i18n/navigation";
+import { getReactionCounts } from "@/lib/actions/reaction-utils";
 import type { Action } from "@/lib/types/action";
 
 type ClientSafeAction = Omit<Action, "createdAt" | "updatedAt">;
@@ -56,6 +57,12 @@ export function ActionCard({
       <div className="flex items-center gap-2">
         <ActionTypeBadge type={action.type} />
         <span className="font-display font-bold">{action.title}</span>
+        {action.opponent && (
+          // "vs." is deliberately untranslated — ActionCard receives all its
+          // labels as props (no useTranslations), and the abbreviation reads
+          // fine in both locales.
+          <span className="font-display text-muted-foreground">vs. {action.opponent}</span>
+        )}
         {action.result && (
           <span className="font-impact text-lg">
             {action.result.ourScore}&thinsp;:&thinsp;{action.result.theirScore}
@@ -68,14 +75,17 @@ export function ActionCard({
         {action.time ? ` · ${action.time}` : ""}
         {action.location ? ` · ${action.location}` : ""}
       </p>
+      {variant === "detail" && action.description && (
+        <p className="text-sm">{action.description}</p>
+      )}
       <SquadChips playerIds={action.squadPlayerIds} players={players} />
       {variant !== "detail" && (
         <div className="flex items-center gap-2 pt-1">
           {currentUid && (
-            <LikeButton
+            <ReactionPicker
               actionId={action.id}
-              initialIsLiked={action.likedByUids?.includes(currentUid) ?? false}
-              initialCount={action.likedByUids?.length ?? 0}
+              initialCounts={getReactionCounts(action.reactions ?? {})}
+              initialMyReaction={(action.reactions ?? {})[currentUid] ?? null}
             />
           )}
           <Link

@@ -17,11 +17,23 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "@/i18n/navigation";
 import type { Season } from "@/lib/types/season";
 
-const schema = z.object({
-  name: z.string().min(2).max(20),
-});
+// The date inputs produce "" when left blank — onSubmit normalizes "" to
+// null so the payload matches the server-side seasonSchema.
+function buildSchema(dateRangeError: string) {
+  return z
+    .object({
+      name: z.string().min(2).max(20),
+      startDate: z.string(),
+      endDate: z.string(),
+    })
+    .refine(
+      // ISO yyyy-mm-dd strings compare correctly as plain strings.
+      (season) => !season.startDate || !season.endDate || season.startDate <= season.endDate,
+      { message: dateRangeError, path: ["endDate"] },
+    );
+}
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 // Server Components can't pass Firestore Timestamp instances to Client
 // Components — the caller strips createdAt/updatedAt before passing down.
@@ -44,17 +56,26 @@ export function SeasonForm({ teamId, season }: SeasonFormProps) {
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { name: season?.name ?? "" },
+    resolver: zodResolver(buildSchema(t("dateRangeInvalid"))),
+    defaultValues: {
+      name: season?.name ?? "",
+      startDate: season?.startDate ?? "",
+      endDate: season?.endDate ?? "",
+    },
   });
 
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
     try {
+      const payload = {
+        name: values.name,
+        startDate: values.startDate || null,
+        endDate: values.endDate || null,
+      };
       if (season) {
-        await updateSeasonAction(season.id, values);
+        await updateSeasonAction(season.id, payload);
       } else {
-        await createSeasonAction(teamId, values);
+        await createSeasonAction(teamId, payload);
       }
       toast.success(t(season ? "updated" : "created"));
       // No router.refresh() here: calling it immediately after push()
@@ -75,6 +96,21 @@ export function SeasonForm({ teamId, season }: SeasonFormProps) {
         <Label htmlFor="name">{t("name")}</Label>
         <Input id="name" placeholder={t("namePlaceholder")} {...register("name")} />
         {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="startDate">{t("startDate")}</Label>
+          <Input id="startDate" type="date" {...register("startDate")} />
+          {errors.startDate && (
+            <p className="text-xs text-destructive">{errors.startDate.message}</p>
+          )}
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="endDate">{t("endDate")}</Label>
+          <Input id="endDate" type="date" {...register("endDate")} />
+          {errors.endDate && <p className="text-xs text-destructive">{errors.endDate.message}</p>}
+        </div>
       </div>
 
       <Button type="submit" disabled={isSubmitting}>

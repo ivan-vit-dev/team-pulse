@@ -3,7 +3,7 @@ import "server-only";
 import { FieldPath, FieldValue } from "firebase-admin/firestore";
 
 import { adminFirestore } from "@/lib/firebase/admin";
-import type { Action, ActionResult, ActionType } from "@/lib/types/action";
+import type { Action, ActionResult, ActionType, ReactionType } from "@/lib/types/action";
 
 const actionsCollection = adminFirestore.collection("actions");
 
@@ -16,6 +16,7 @@ export const PAST_ACTIONS_PAGE_SIZE = 10;
 export interface ActionInput {
   type: ActionType;
   title: string;
+  opponent: string | null;
   competition: string | null;
   date: string;
   time: string | null;
@@ -23,7 +24,7 @@ export interface ActionInput {
   isHome: boolean | null;
   result: ActionResult | null;
   squadPlayerIds: string[];
-  notes: string | null;
+  description: string | null;
 }
 
 export async function createAction(
@@ -37,8 +38,9 @@ export async function createAction(
     teamId,
     seasonId,
     ...input,
-    likedByUids: [],
+    reactions: {},
     createdBy: creatorUid,
+    updatedBy: creatorUid,
   };
   await ref.set({
     ...newAction,
@@ -106,9 +108,13 @@ export async function listPastActionsForSeasonPage(
   };
 }
 
-export async function updateAction(actionId: string, input: ActionInput): Promise<void> {
+export async function updateAction(
+  actionId: string,
+  input: ActionInput,
+  updatedByUid: string,
+): Promise<void> {
   await actionsCollection.doc(actionId).set(
-    { ...input, updatedAt: FieldValue.serverTimestamp() },
+    { ...input, updatedBy: updatedByUid, updatedAt: FieldValue.serverTimestamp() },
     { merge: true },
   );
 }
@@ -117,14 +123,15 @@ export async function deleteAction(actionId: string): Promise<void> {
   await actionsCollection.doc(actionId).delete();
 }
 
-export async function likeAction(actionId: string, uid: string): Promise<void> {
+// A single dot-path field update — switching reaction type is just an
+// overwrite (atomic, no read-then-write race), and removing is a field
+// delete, not an arrayRemove across two separate per-type arrays.
+export async function setReaction(
+  actionId: string,
+  uid: string,
+  type: ReactionType | null,
+): Promise<void> {
   await actionsCollection.doc(actionId).update({
-    likedByUids: FieldValue.arrayUnion(uid),
-  });
-}
-
-export async function unlikeAction(actionId: string, uid: string): Promise<void> {
-  await actionsCollection.doc(actionId).update({
-    likedByUids: FieldValue.arrayRemove(uid),
+    [`reactions.${uid}`]: type === null ? FieldValue.delete() : type,
   });
 }

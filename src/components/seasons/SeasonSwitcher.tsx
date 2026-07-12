@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import {
   Select,
   SelectContent,
@@ -25,7 +27,12 @@ export function SeasonSwitcher({
   selectedSeasonId,
   basePath,
 }: SeasonSwitcherProps) {
+  const t = useTranslations("seasons");
   const router = useRouter();
+
+  function seasonLabel(season: ClientSafeSeason): string {
+    return season.isArchived ? `${season.name} (${t("archived")})` : season.name;
+  }
 
   return (
     <Select
@@ -39,13 +46,16 @@ export function SeasonSwitcher({
         {/* Select.Value doesn't auto-resolve a label from the matching
             SelectItem's children — it needs an explicit render function. */}
         <SelectValue>
-          {(value: string) => seasons.find((season) => season.id === value)?.name ?? value}
+          {(value: string) => {
+            const season = seasons.find((s) => s.id === value);
+            return season ? seasonLabel(season) : value;
+          }}
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
         {seasons.map((season) => (
           <SelectItem key={season.id} value={season.id}>
-            {season.name}
+            {seasonLabel(season)}
           </SelectItem>
         ))}
       </SelectContent>

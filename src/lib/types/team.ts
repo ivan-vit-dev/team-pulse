@@ -40,3 +40,19 @@ export interface AdminInvite {
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
+
+// Fan-facing parallel to AdminInvite — accepting calls followTeam, not
+// addTeamAdmin. Kept as a separate collection/type rather than a variant of
+// AdminInvite so the two invite kinds (admin rights vs. just following) can
+// never be confused at the rules/repository layer.
+export type FollowInviteStatus = "pending" | "accepted" | "declined";
+
+export interface FollowInvite {
+  id: string;
+  teamId: string;
+  invitedEmail: string;
+  invitedByUid: string;
+  status: FollowInviteStatus;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}

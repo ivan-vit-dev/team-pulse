@@ -28,9 +28,17 @@ interface ActionAdminListProps {
   teamId: string;
   seasonId: string;
   actions: ClientSafeAction[];
+  /** Archived seasons are closed for new content — the server rejects
+   *  create/edit, so the Edit link is hidden too (delete stays available). */
+  seasonArchived?: boolean;
 }
 
-export function ActionAdminList({ teamId, seasonId, actions }: ActionAdminListProps) {
+export function ActionAdminList({
+  teamId,
+  seasonId,
+  actions,
+  seasonArchived = false,
+}: ActionAdminListProps) {
   const t = useTranslations("actions");
   const tc = useTranslations("common");
   const ta = useTranslations("auth");
@@ -61,6 +69,9 @@ export function ActionAdminList({ teamId, seasonId, actions }: ActionAdminListPr
             <div className="flex items-center gap-2">
               <ActionTypeBadge type={action.type} />
               <span className="font-medium">{action.title}</span>
+              {action.opponent && (
+                <span className="text-sm text-muted-foreground">vs. {action.opponent}</span>
+              )}
               {action.result && (
                 <span className="text-sm text-muted-foreground">
                   {action.result.ourScore} : {action.result.theirScore}
@@ -76,15 +87,17 @@ export function ActionAdminList({ teamId, seasonId, actions }: ActionAdminListPr
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              render={
-                <Link href={`/teams/${teamId}/admin/seasons/${seasonId}/actions/${action.id}/edit`}>
-                  {t("editAction")}
-                </Link>
-              }
-            />
+            {!seasonArchived && (
+              <Button
+                variant="outline"
+                size="sm"
+                render={
+                  <Link href={`/teams/${teamId}/admin/seasons/${seasonId}/actions/${action.id}/edit`}>
+                    {t("editAction")}
+                  </Link>
+                }
+              />
+            )}
             <AlertDialog>
               <AlertDialogTrigger
                 render={

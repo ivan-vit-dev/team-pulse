@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeamPulse — Developer Reference</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        oklch(0.10 0.018 250);
+      --surface:   oklch(0.16 0.02 250);
+      --surface2:  oklch(0.22 0.014 250);
+      --border:    oklch(1 0 0 / 12%);
+      --primary:   oklch(0.72 0.19 250);
+      --teal:      oklch(0.60 0.18 195);
+      --floodlight: oklch(0.78 0.16 78);
+      --text:      oklch(0.95 0.004 250);
+      --muted:     oklch(0.64 0.016 250);
+      --dim:       oklch(0.50 0.014 250);
+      --green:     oklch(0.72 0.17 150);
+      --blue:      oklch(0.72 0.14 230);
+      --orange:    oklch(0.75 0.15 55);
+      --red:       oklch(0.68 0.19 25);
+      --sidebar-w: 260px;
+      --radius:    8px;
+    }
+
+    body {
+      font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed; top: 0; left: 0;
+      height: 100vh; overflow-y: auto;
+      padding: 0 0 32px;
+      flex-shrink: 0;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .sidebar-logo {
+      padding: 18px 16px 14px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 800; font-size: .95rem;
+    }
+    .sidebar-logo span { color: var(--teal); }
+    .nav-group { padding: 14px 0 4px; }
+    .nav-group-label {
+      padding: 0 16px 6px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim);
+    }
+    .nav-link {
+      display: block; padding: 6px 16px;
+      font-size: .82rem; color: var(--muted);
+      text-decoration: none;
+      transition: color .15s, background .15s;
+    }
+    .nav-link:hover { color: var(--text); background: var(--surface2); }
+    .nav-link.active { color: var(--teal); background: color-mix(in oklch, var(--teal) 10%, transparent); }
+
+    /* ── Main ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; padding: 0 0 80px; }
+
+    .page-header {
+      background:
+        radial-gradient(70% 120% at 90% 0%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 60%),
+        var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 40px 48px 32px;
+    }
+    .page-header .label {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 8px;
+    }
+    .page-header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.5px; }
+    .page-header p { color: var(--muted); margin-top: 8px; max-width: 600px; font-size: .9rem; }
+
+    .section { padding: 40px 48px; border-bottom: 1px solid var(--border); }
+    .section:last-of-type { border-bottom: none; }
+    .section > h2 {
+      font-size: 1.35rem; font-weight: 700; letter-spacing: -.3px;
+      margin-bottom: 4px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section > .section-desc { color: var(--muted); font-size: .85rem; margin-bottom: 20px; margin-top: 6px; }
+
+    h3 { font-size: 1rem; font-weight: 700; margin: 24px 0 8px; color: var(--teal); }
+    h3:first-child { margin-top: 0; }
+    p { font-size: .88rem; color: var(--muted); margin: 6px 0; }
+
+    code {
+      font-family: "Cascadia Code", "Fira Code", "Courier New", monospace;
+      font-size: .8rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: var(--floodlight);
+    }
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: "Cascadia Code", "Fira Code", monospace;
+      font-size: .78rem;
+      line-height: 1.7;
+      color: var(--text);
+      margin: 10px 0;
+    }
+    pre .c { color: var(--dim); }
+    pre .k { color: var(--blue); }
+    pre .s { color: var(--green); }
+    pre .p { color: var(--floodlight); }
+
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--surface2); vertical-align: top; }
+    thead th {
+      background: var(--surface2); color: var(--muted);
+      font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    }
+    tbody tr:hover { background: var(--surface); }
+    td { font-size: .83rem; }
+    td:first-child { white-space: nowrap; }
+    td code { font-size: .75rem; }
+
+    .box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin: 10px 0;
+    }
+    .box-title { font-weight: 700; font-size: .88rem; margin-bottom: 6px; color: var(--text); }
+    .box p { margin: 0; }
+
+    .page-entry {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin: 14px 0;
+      overflow: hidden;
+    }
+    .page-entry-header {
+      background: var(--surface2);
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .page-entry-route { font-family: monospace; font-size: .82rem; color: var(--blue); font-weight: 600; }
+    .page-entry-file { font-family: monospace; font-size: .75rem; color: var(--dim); margin-left: auto; }
+    .page-entry-body { padding: 12px 16px; }
+    .page-entry-body p { margin: 4px 0; }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px; border-radius: 999px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .5px;
+    }
+    .tag-public  { background: color-mix(in oklch, var(--green) 15%, transparent); color: var(--green); }
+    .tag-auth    { background: color-mix(in oklch, var(--blue)  15%, transparent); color: var(--blue); }
+    .tag-admin   { background: color-mix(in oklch, var(--red)   15%, transparent); color: var(--red); }
+    .tag-api     { background: color-mix(in oklch, var(--orange) 15%, transparent); color: var(--orange); }
+
+    .pill-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+    .pill {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 2px 10px;
+      font-size: .75rem; color: var(--muted);
+      font-family: monospace;
+    }
+
+    .file-tree {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      font-family: "Cascadia Code", "Fira Code", monospace;
+      font-size: .78rem;
+      line-height: 2;
+      color: var(--muted);
+      overflow-x: auto;
+    }
+    .file-tree .dir  { color: var(--blue); }
+    .file-tree .file { color: var(--text); }
+    .file-tree .note { color: var(--dim); font-style: italic; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+    .hl { border-left: 3px solid var(--teal); padding-left: 10px; margin: 8px 0; }
+    .hl strong { color: var(--text); font-size: .88rem; display: block; }
+    .hl span { color: var(--muted); font-size: .82rem; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .section, .page-header { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ─────────────── SIDEBAR ─────────────── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">Team<span>Pulse</span><br><small style="color:var(--dim);font-weight:400;font-size:.7rem">Developer Reference</small></div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Project</div>
+    <a class="nav-link" href="#architecture">Architecture</a>
+    <a class="nav-link" href="#structure">File Structure</a>
+    <a class="nav-link" href="#routing">Route Map</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Pages</div>
+    <a class="nav-link" href="#pg-public">Public Pages</a>
+    <a class="nav-link" href="#pg-auth">Auth Pages</a>
+    <a class="nav-link" href="#pg-home">Home / Feed</a>
+    <a class="nav-link" href="#pg-app">Protected Pages</a>
+    <a class="nav-link" href="#pg-admin">Admin Dashboard</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Components</div>
+    <a class="nav-link" href="#comp-layout">Layout</a>
+    <a class="nav-link" href="#comp-auth">Auth &amp; Profile</a>
+    <a class="nav-link" href="#comp-teams">Teams</a>
+    <a class="nav-link" href="#comp-players">Players</a>
+    <a class="nav-link" href="#comp-seasons">Seasons &amp; Actions</a>
+    <a class="nav-link" href="#comp-timeline">Timeline</a>
+    <a class="nav-link" href="#comp-engage">Comments &amp; Media</a>
+    <a class="nav-link" href="#comp-reports">Reports &amp; Notifications</a>
+    <a class="nav-link" href="#comp-ui">UI Primitives</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Business Logic</div>
+    <a class="nav-link" href="#lib-firebase">Firebase Init</a>
+    <a class="nav-link" href="#lib-auth">Auth &amp; Session</a>
+    <a class="nav-link" href="#lib-repos">Repositories</a>
+    <a class="nav-link" href="#lib-youth">Youth Privacy</a>
+    <a class="nav-link" href="#lib-media">Media &amp; Video Links</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Infrastructure</div>
+    <a class="nav-link" href="#types">Types</a>
+    <a class="nav-link" href="#i18n">i18n</a>
+    <a class="nav-link" href="#firebase-config">Firebase Config</a>
+    <a class="nav-link" href="#security">Security Rules</a>
+    <a class="nav-link" href="#functions">Cloud Functions</a>
+    <a class="nav-link" href="#patterns">Patterns &amp; Gotchas</a>
+  </div>
+</nav>
+
+<!-- ─────────────── MAIN ─────────────── -->
+<main class="main">
+
+<div class="page-header">
+  <div class="label">Developer Reference</div>
+  <h1>TeamPulse</h1>
+  <p>Page-by-page, component-by-component, file-by-file reference for developers working on this
+     codebase. Companion to <code>CLAUDE.md</code> (conventions) and <code>APP_DESIGN.md</code>
+     (design system).</p>
+</div>
+
+<!-- ─────────────────────────────── ARCHITECTURE ─────────────────────────────── -->
+<div class="section" id="architecture">
+  <h2>Architecture Overview</h2>
+  <p class="section-desc">Guiding constraints and decisions — read this before touching the code.</p>
+
+  <div class="two-col">
+    <div class="box">
+      <div class="box-title">Auth model — server-first</div>
+      <p>Client SDK sign-in → ID token POSTed to <code>/api/auth/session</code> (Node runtime) →
+         firebase-admin verifies, ensures the Firestore profile exists, mints an httpOnly session
+         cookie. <code>getCurrentUser()</code> in <code>src/lib/auth/session.ts</code> is the
+         authoritative check; <code>useAuth</code>/<code>AuthProvider</code> client state is UX only.</p>
+    </div>
+    <div class="box">
+      <div class="box-title">Firestore access</div>
+      <p>All mutations go through Server Actions calling repository modules in
+         <code>src/lib/*</code> (Admin SDK). Client code never writes Firestore directly — the only
+         direct client Firebase use is Storage uploads (avatars, logos, action photos).
+         Authorization is TypeScript-first via <code>requireTeamAdmin()</code>.</p>
+    </div>
+    <div class="box">
+      <div class="box-title">Youth privacy — document boundary</div>
+      <p>Firestore has no field-level read security, so players split into a world-readable public
+         doc and <code>players/{id}/private/profile</code> (real name, birthdate — admin-only).
+         <code>isYouth</code> is recomputed server-side on every write; youth avatars force-nulled.</p>
+    </div>
+    <div class="box">
+      <div class="box-title">Notifications pipeline</div>
+      <p>Five Firestore triggers in <code>functions/src/index.ts</code> funnel through a shared
+         <code>notifyUsers()</code>: per-category preference gate (skips the in-app write entirely),
+         in-app inbox doc, FCM multicast with invalid-token pruning.</p>
+    </div>
+    <div class="box">
+      <div class="box-title">Rules are defense-in-depth</div>
+      <p><code>firestore.rules</code>/<code>storage.rules</code> encode the intended access model
+         (and keep a future real-time-listener feature from being wide open), but real writes go
+         through the Admin SDK which bypasses them. Both layers must stay in sync.</p>
+    </div>
+    <div class="box">
+      <div class="box-title">Schema evolution</div>
+      <p>Pre-launch convention: full-replace renames (likes → <code>reactions</code>, notes →
+         <code>description</code>) plus defensive reads that default missing fields
+         (<code>kind</code>, <code>isPinned</code>, <code>isArchived</code>, <code>startDate</code>).
+         No migration scripts.</p>
+    </div>
+  </div>
+
+  <h3>Firestore Collections</h3>
+  <pre>users/{uid}                             <span class="c"># profile, followedTeamIds, fcmTokens, notificationPreferences</span>
+users/{uid}/notifications/{id}          <span class="c"># in-app inbox (Cloud-Function-written only)</span>
+teams/{teamId}                          <span class="c"># adminUids: string[] gates all writes</span>
+teamAdminInvites/{inviteId}             <span class="c"># matched by email, not uid</span>
+teamFollowInvites/{inviteId}            <span class="c"># fan-facing parallel of admin invites</span>
+players/{playerId}                      <span class="c"># PUBLIC: displayName (pseudonym), jerseyNumber, isYouth, avatarURL</span>
+players/{playerId}/private/profile      <span class="c"># PRIVATE: realName, birthdate — admin-of-team only</span>
+seasons/{seasonId}                      <span class="c"># name, startDate/endDate (nullable ISO), isActive, isArchived</span>
+actions/{actionId}                      <span class="c"># type, title, opponent, description, date/time, result, squad, reactions</span>
+comments/{commentId}                    <span class="c"># parentCommentId: single-level reply threading; isPinned</span>
+media/{mediaId}                         <span class="c"># kind: "image" | "videoLink"; isPinned</span>
+reports/{reportId}                      <span class="c"># contentType: comment | media | team | player</span></pre>
+
+  <h3>Firebase Storage Paths</h3>
+  <pre>avatars/{uid}/{filename}               <span class="c"># user profile avatars</span>
+teams/{teamId}/{filename}              <span class="c"># team logos</span>
+players/{playerId}/{filename}          <span class="c"># player avatars (blocked server-side for youth)</span>
+actions/{actionId}/{filename}          <span class="c"># action photos (admin upload only)</span></pre>
+</div>
+
+<!-- ─────────────────────────────── FILE STRUCTURE ─────────────────────────────── -->
+<div class="section" id="structure">
+  <h2>File Structure</h2>
+  <p class="section-desc">Canonical layout. Repositories are self-contained per collection (one
+     deliberate exception: season deletion checks its actions).</p>
+
+  <div class="file-tree">
+<span class="dir">src/</span><br>
+├── proxy.ts                 <span class="note"># next-intl locale routing + auth-cookie presence check (NOT middleware.ts)</span><br>
+├── <span class="dir">app/</span><br>
+│   ├── <span class="dir">api/auth/session/</span>  <span class="note"># route.ts — session cookie mint/clear (runtime = nodejs)</span><br>
+│   └── <span class="dir">[locale]/</span><br>
+│       ├── layout.tsx       <span class="note"># fonts, NextIntlClientProvider, AuthProvider, Navbar/Footer</span><br>
+│       ├── page.tsx         <span class="note"># landing (signed-out) / personalized feed (signed-in)</span><br>
+│       ├── <span class="dir">teams/[teamId]/</span> <span class="note"># PUBLIC team page + actions.ts (comments, reactions, reports)</span><br>
+│       │   └── <span class="dir">actions/[actionId]/</span> <span class="note"># action detail (comments, media, roster)</span><br>
+│       ├── <span class="dir">(auth)/</span>         <span class="note"># login/ register/ — redirect away if signed in</span><br>
+│       └── <span class="dir">(app)/</span>          <span class="note"># protected — redirects to /login</span><br>
+│           ├── <span class="dir">settings/</span> · <span class="dir">notifications/</span> · <span class="dir">invites/</span><br>
+│           └── <span class="dir">teams/</span>      <span class="note"># mine · new/ · [teamId]/admin/** (players, seasons, actions)</span><br>
+├── <span class="dir">lib/</span><br>
+│   ├── <span class="dir">firebase/</span>          <span class="note"># client.ts (browser SDK) · admin.ts (server-only)</span><br>
+│   ├── <span class="dir">auth/</span>              <span class="note"># session.ts · require-uid.ts · client-actions.ts</span><br>
+│   ├── <span class="dir">users/</span>             <span class="note"># user-repository.ts (profile, follow/unfollow, FCM tokens)</span><br>
+│   ├── <span class="dir">teams/</span>             <span class="note"># team- · admin-invite- · follow-invite-repository.ts</span><br>
+│   ├── <span class="dir">players/</span>           <span class="note"># player-repository.ts (public/private split) · youth.ts</span><br>
+│   ├── <span class="dir">seasons/</span>           <span class="note"># season-repository.ts (CRUD, setActiveSeason, setSeasonArchived)</span><br>
+│   ├── <span class="dir">actions/</span>           <span class="note"># action-repository.ts (paginated queries, reactions) · reaction-utils.ts</span><br>
+│   ├── <span class="dir">comments/</span>          <span class="note"># comment-repository.ts (create/list/delete/pin)</span><br>
+│   ├── <span class="dir">media/</span>             <span class="note"># media-repository.ts (create/list/delete/pin) · video-url.ts</span><br>
+│   ├── <span class="dir">reports/</span>           <span class="note"># report-repository.ts · report-preview.ts</span><br>
+│   ├── <span class="dir">notifications/</span>     <span class="note"># notification-repository.ts (list, unread count, mark read)</span><br>
+│   ├── <span class="dir">types/</span>             <span class="note"># domain types (user, team, player, season, action, …)</span><br>
+│   └── <span class="dir">utils/</span>             <span class="note"># firebase-errors.ts · omit.ts · color.ts (cn lives in lib/utils.ts)</span><br>
+├── <span class="dir">hooks/</span>                 <span class="note"># useAuth.ts — client auth state (UX only)</span><br>
+├── <span class="dir">components/</span>            <span class="note"># ui/ · layout/ · auth/ · profile/ · teams/ · players/ · seasons/ ·</span><br>
+│                            <span class="note">#   actions/ · timeline/ · comments/ · media/ · reports/ · notifications/ · home/</span><br>
+├── <span class="dir">i18n/</span>                  <span class="note"># routing.ts · request.ts · navigation.ts</span><br>
+└── <span class="dir">messages/</span>              <span class="note"># en.json · cs.json</span>
+  </div>
+
+  <div class="file-tree" style="margin-top:12px">
+<span class="dir">functions/src/</span> index.ts   <span class="note"># 5 Firestore triggers + shared notifyUsers()</span><br>
+<span class="dir">public/</span>        firebase-messaging-sw.js<br>
+<span class="file">firestore.rules</span> · <span class="file">storage.rules</span> · <span class="file">firebase.json</span> · <span class="file">CLAUDE.md</span> · <span class="file">APP_DESIGN.md</span>
+  </div>
+
+  <div class="box" style="margin-top:14px">
+    <div class="box-title">Two different teams/[teamId] routes — intentional</div>
+    <p>The <strong>public</strong> team page lives at <code>[locale]/teams/[teamId]/</code>
+       (outside <code>(app)</code>, so logged-out fans can view it); the <strong>admin</strong>
+       dashboard lives at <code>[locale]/(app)/teams/[teamId]/admin/</code>. Route groups add no
+       URL segment, so both share the <code>/teams/...</code> URL space without colliding.</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────── ROUTE MAP ─────────────────────────────── -->
+<div class="section" id="routing">
+  <h2>Route Map</h2>
+  <p class="section-desc">All routes live under <code>src/app/[locale]/</code> (locale prefix
+     always on: <code>/en/...</code>, <code>/cs/...</code>). Middleware: <code>src/proxy.ts</code>.</p>
+
+  <table>
+    <thead><tr><th>URL Pattern</th><th>Access</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/en</code> · <code>/cs</code></td><td><span class="tag tag-public">public</span></td><td>Landing page (signed out) / personalized feed (signed in)</td></tr>
+      <tr><td><code>/en/teams/:teamId</code></td><td><span class="tag tag-public">public</span></td><td>Team page: header, roster, season switcher, timeline</td></tr>
+      <tr><td><code>/en/teams/:teamId/actions/:actionId</code></td><td><span class="tag tag-public">public</span></td><td>Action detail: card, reactions, media gallery, comments</td></tr>
+      <tr><td><code>/en/login</code> · <code>/en/register</code></td><td><span class="tag tag-public">public</span></td><td><code>(auth)</code> group — redirects away if already signed in</td></tr>
+      <tr><td><code>/en/settings</code></td><td><span class="tag tag-auth">auth</span></td><td>Profile, avatar, notification preferences, followed teams</td></tr>
+      <tr><td><code>/en/notifications</code></td><td><span class="tag tag-auth">auth</span></td><td>In-app notification inbox (paginated, mark read / mark all)</td></tr>
+      <tr><td><code>/en/invites</code></td><td><span class="tag tag-auth">auth</span></td><td>Pending admin invites + follow invites, accept/decline</td></tr>
+      <tr><td><code>/en/teams</code></td><td><span class="tag tag-auth">auth</span></td><td>"My teams" — teams the user administers</td></tr>
+      <tr><td><code>/en/teams/new</code></td><td><span class="tag tag-auth">auth</span></td><td>Create team</td></tr>
+      <tr><td><code>/en/teams/:teamId/admin</code></td><td><span class="tag tag-admin">admin</span></td><td>Dashboard: team, admins, invites, players, seasons, actions, reports</td></tr>
+      <tr><td><code>…/admin/players/new</code> · <code>…/players/:id/edit</code></td><td><span class="tag tag-admin">admin</span></td><td>Player CRUD (public + private fields, youth handling)</td></tr>
+      <tr><td><code>…/admin/seasons/new</code> · <code>…/seasons/:id/edit</code></td><td><span class="tag tag-admin">admin</span></td><td>Season CRUD (name, date bounds)</td></tr>
+      <tr><td><code>…/seasons/:id/actions/new</code> · <code>…/actions/:id/edit</code></td><td><span class="tag tag-admin">admin</span></td><td>Action CRUD (blocked for archived seasons)</td></tr>
+      <tr><td><code>/api/auth/session</code></td><td><span class="tag tag-api">api</span></td><td>POST: verify ID token, mint session cookie · DELETE: clear</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─────────────────────────────── PAGES ─────────────────────────────── -->
+<div class="section" id="pg-public">
+  <h2>Public Pages</h2>
+
+  <div class="page-entry">
+    <div class="page-entry-header">
+      <span class="tag tag-public">public</span>
+      <span class="page-entry-route">/en/teams/:teamId</span>
+      <span class="page-entry-file">src/app/[locale]/teams/[teamId]/page.tsx</span>
+    </div>
+    <div class="page-entry-body">
+      <p>Public team page. Team header (logo, category, club, location) with team-brand scoped
+         colors, Follow/Report buttons for signed-in non-admins, season switcher, and the
+         timeline: next-action highlight, upcoming list, paginated past-actions feed. Colocated
+         <code>actions.ts</code> holds the fan-facing Server Actions (comments, reactions,
+         reports, load-more).</p>
+      <div class="pill-list">
+        <span class="pill">SeasonSwitcher</span><span class="pill">ActionCard</span>
+        <span class="pill">UpcomingActionsList</span><span class="pill">PastActionsFeed</span>
+        <span class="pill">RosterGrid</span><span class="pill">FollowButton</span><span class="pill">ReportButton</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-entry">
+    <div class="page-entry-header">
+      <span class="tag tag-public">public</span>
+      <span class="page-entry-route">/en/teams/:teamId/actions/:actionId</span>
+      <span class="page-entry-file">src/app/[locale]/teams/[teamId]/actions/[actionId]/page.tsx</span>
+    </div>
+    <div class="page-entry-body">
+      <p>Action detail. Detail-variant <code>ActionCard</code> (with description + squad),
+         <code>ReactionPicker</code> for signed-in users, media gallery (photos + video embeds,
+         pinned first, admin add/delete/pin controls), and the comment thread (pinned first,
+         single-level replies).</p>
+      <div class="pill-list">
+        <span class="pill">ActionCard</span><span class="pill">ReactionPicker</span>
+        <span class="pill">ActionMediaUploader</span><span class="pill">AddVideoLinkDialog</span>
+        <span class="pill">ActionMediaGallery</span><span class="pill">CommentList</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="pg-auth">
+  <h2>Auth Pages</h2>
+  <p class="section-desc"><code>src/app/[locale]/(auth)/</code> — the group layout redirects to
+     the app if a session already exists.</p>
+
+  <div class="page-entry">
+    <div class="page-entry-header">
+      <span class="tag tag-public">public</span>
+      <span class="page-entry-route">/en/login · /en/register</span>
+      <span class="page-entry-file">src/app/[locale]/(auth)/…/page.tsx</span>
+    </div>
+    <div class="page-entry-body">
+      <p>Email/password + Google sign-in. Flow: Firebase client SDK auth → ID token →
+         <code>POST /api/auth/session</code> → httpOnly cookie → redirect. Profile creation happens
+         inside the session route (<code>ensureUserProfile()</code>, idempotent) — no onCreate
+         trigger, no race with the redirect.</p>
+      <div class="pill-list">
+        <span class="pill">LoginForm</span><span class="pill">RegisterForm</span><span class="pill">GoogleSignInButton</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="pg-home">
+  <h2>Home / Feed</h2>
+
+  <div class="page-entry">
+    <div class="page-entry-header">
+      <span class="tag tag-public">public</span>
+      <span class="page-entry-route">/en</span>
+      <span class="page-entry-file">src/app/[locale]/page.tsx</span>
+    </div>
+    <div class="page-entry-body">
+      <p>Signed out: marketing landing (gradient hero, pitch-lines texture, CTAs). Signed in:
+         personalized home — <code>FollowedTeamsFeed</code> (next/most recent action per followed
+         team via <code>getActiveSeason()</code>) and <code>AdminTeamsPanel</code> shortcuts for
+         teams the user manages.</p>
+      <div class="pill-list"><span class="pill">FollowedTeamsFeed</span><span class="pill">AdminTeamsPanel</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="pg-app">
+  <h2>Protected Pages</h2>
+  <p class="section-desc"><code>src/app/[locale]/(app)/</code> — the group layout calls
+     <code>getCurrentUser()</code> server-side and redirects to <code>/login</code> if
+     unauthenticated. No client-side auth flash.</p>
+
+  <div class="page-entry">
+    <div class="page-entry-header">
+      <span class="tag tag-auth">auth</span>
+      <span class="page-entry-route">/en/settings</span>
+      <span class="page-entry-file">src/app/[locale]/(app)/settings/page.tsx</span>
+    </div>
+    <div class="page-entry-body">
+      <p>Profile form (display name, locale), avatar upload (client Storage upload → Server Action
+         persists URL), per-category notification preferences + push channel switch, and the
+         followed-teams list with unfollow.</p>
+      <div class="pill-list">
+        <span class="pill">ProfileForm</span><span class="pill">AvatarUploader</span>
+        <span class="pill">NotificationPrefsForm</span><span class="pill">FollowedTeamsList</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-entry">
+    <div class="page-entry-header">
+      <span class="tag tag-auth">auth</span>
+      <span class="page-entry-route">/en/notifications</span>
+      <span class="page-entry-file">src/app/[locale]/(app)/notifications/page.tsx</span>
+    </div>
+    <div class="page-entry-body">
+      <p>Full inbox history with load-more pagination, mark-read on click, mark-all-read. The
+         Navbar bell (<code>NotificationBell</code>) shows the unread count and a recent dropdown
+         backed by the same Server Actions.</p>
+      <div class="pill-list"><span class="pill">NotificationList</span><span class="pill">NotificationRow</span></div>
+    </div>
+  </div>
+
+  <div class="page-entry">
+    <div class="page-entry-header">
+      <span class="tag tag-auth">auth</span>
+      <span class="page-entry-route">/en/invites</span>
+      <span class="page-entry-file">src/app/[locale]/(app)/invites/page.tsx</span>
+    </div>
+    <div class="page-entry-body">
+      <p>Admin invites and follow invites side by side, matched to the signed-in user by verified
+         email. Accepting an admin invite atomically flips the invite status and joins
+         <code>adminUids</code>; accepting a follow invite calls <code>followTeam</code>.</p>
+      <div class="pill-list"><span class="pill">InvitesList</span><span class="pill">FollowInvitesList</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="pg-admin">
+  <h2>Admin Dashboard</h2>
+
+  <div class="page-entry">
+    <div class="page-entry-header">
+      <span class="tag tag-admin">admin</span>
+      <span class="page-entry-route">/en/teams/:teamId/admin</span>
+      <span class="page-entry-file">src/app/[locale]/(app)/teams/[teamId]/admin/page.tsx</span>
+    </div>
+    <div class="page-entry-body">
+      <p>Single-page dashboard: edit team + logo, admin list with pending admin/fan invites and
+         a share-follow-link button, player roster admin, season list (active badge, archived
+         badge, date range, archive/unarchive), season-scoped action list (add/edit hidden for
+         archived seasons), and the pending-reports moderation queue with content previews.
+         Colocated <code>actions.ts</code> holds ~30 admin Server Actions, all guarded by
+         <code>requireTeamAdmin(teamId)</code>.</p>
+      <div class="pill-list">
+        <span class="pill">EditTeamForm</span><span class="pill">TeamLogoUploader</span><span class="pill">AdminList</span>
+        <span class="pill">InviteAdminForm</span><span class="pill">InviteFanForm</span><span class="pill">ShareFollowLinkButton</span>
+        <span class="pill">PlayerAdminList</span><span class="pill">SeasonAdminList</span><span class="pill">ActionAdminList</span>
+        <span class="pill">ReportsAdminList</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────── COMPONENTS ─────────────────────────────── -->
+<div class="section" id="comp-layout">
+  <h2>Layout Components</h2>
+  <p class="section-desc"><code>src/components/layout/</code></p>
+  <table>
+    <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>Navbar</code></td><td>Server component. Logged out: logo + auth CTAs. Logged in: My Teams link, NotificationBell, locale switcher, theme toggle, avatar dropdown.</td></tr>
+      <tr><td><code>Footer</code></td><td>Site footer with locale-aware links.</td></tr>
+      <tr><td><code>LocaleSwitcher</code></td><td>en/cs switch preserving the current route.</td></tr>
+      <tr><td><code>UserMenu</code></td><td>Avatar dropdown: Settings, Log out (clears the session cookie then client sign-out).</td></tr>
+      <tr><td><code>AmbientBackground</code></td><td>Fixed behind everything; paints <code>--background</code> plus soft navy/teal/floodlight blobs. <code>body</code> itself paints no background.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="comp-auth">
+  <h2>Auth &amp; Profile Components</h2>
+  <p class="section-desc"><code>src/components/auth/</code> · <code>src/components/profile/</code></p>
+  <table>
+    <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>AuthProvider</code></td><td>Client-side <code>onAuthStateChanged</code> context — UX state only, never authorization.</td></tr>
+      <tr><td><code>LoginForm</code> / <code>RegisterForm</code></td><td>react-hook-form + zod; errors mapped through <code>getFirebaseErrorMessage()</code>, never raw codes.</td></tr>
+      <tr><td><code>GoogleSignInButton</code></td><td>Popup sign-in → same session-cookie exchange as email/password.</td></tr>
+      <tr><td><code>ProfileForm</code></td><td>Display name + preferred locale.</td></tr>
+      <tr><td><code>AvatarUploader</code></td><td>Client Storage upload to <code>avatars/{uid}/</code>, then Server Action persists the URL.</td></tr>
+      <tr><td><code>NotificationPrefsForm</code></td><td>Push/email channel switches + per-category toggles (<code>notificationPreferences.categories</code>). Email channel exists on the shape but nothing sends to it yet.</td></tr>
+      <tr><td><code>FollowedTeamsList</code></td><td>Followed teams with unfollow buttons.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="comp-teams">
+  <h2>Team Components</h2>
+  <p class="section-desc"><code>src/components/teams/</code></p>
+  <table>
+    <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>CreateTeamForm</code> / <code>EditTeamForm</code></td><td>Name, category, club, location, home pitch, brand colors (hex-validated), social links.</td></tr>
+      <tr><td><code>TeamLogoUploader</code></td><td>Client Storage upload to <code>teams/{teamId}/</code>.</td></tr>
+      <tr><td><code>AdminList</code></td><td>Current admins with remove (guarded against removing the last admin).</td></tr>
+      <tr><td><code>InviteAdminForm</code> / <code>PendingInvitesList</code></td><td>Email-matched admin invites: create, revoke.</td></tr>
+      <tr><td><code>InviteFanForm</code> / <code>PendingFollowInvitesList</code></td><td>Fan-facing follow invites — identical shape, accepting calls <code>followTeam</code>.</td></tr>
+      <tr><td><code>InvitesList</code> / <code>FollowInvitesList</code></td><td>The invited user's accept/decline UI on <code>/invites</code>.</td></tr>
+      <tr><td><code>ShareFollowLinkButton</code></td><td>Copy/share the public team page URL (Web Share API with clipboard fallback).</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="comp-players">
+  <h2>Player Components</h2>
+  <p class="section-desc"><code>src/components/players/</code> — every public surface renders
+     <code>PlayerPublic</code>, never a hand-rolled "safe" view.</p>
+  <table>
+    <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>PlayerForm</code></td><td>Public fields (pseudonym/display name, jersey number) + private fields (real name, birthdate). Live youth indicator computed from birthdate.</td></tr>
+      <tr><td><code>PlayerAvatarUploader</code></td><td>Storage upload to <code>players/{playerId}/</code> — the UI hides it for youth players and the Server Action rejects it regardless.</td></tr>
+      <tr><td><code>PlayerAdminList</code></td><td>Roster admin view (real names visible to admins only).</td></tr>
+      <tr><td><code>RosterGrid</code></td><td>Public roster on the team page — pseudonyms + numbers.</td></tr>
+      <tr><td><code>YouthPrivacyBadge</code></td><td>Lock/shield icon + tooltip with a meaningful <code>aria-label</code>; required wherever a youth identity could otherwise leak.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="comp-seasons">
+  <h2>Season &amp; Action Components</h2>
+  <p class="section-desc"><code>src/components/seasons/</code> · <code>src/components/actions/</code></p>
+  <table>
+    <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>SeasonForm</code></td><td>Name + optional start/end dates (ISO strings, "" normalized to null, range-validated).</td></tr>
+      <tr><td><code>SeasonAdminList</code></td><td>Active badge, archived badge, date range, set-active (hidden for archived), archive/unarchive, delete (blocked while actions exist).</td></tr>
+      <tr><td><code>SeasonSwitcher</code></td><td>Season select used on both the public page and the dashboard; archived seasons labelled "(archived)".</td></tr>
+      <tr><td><code>ActionForm</code></td><td>Type, title, opponent (match-like types only), competition, date/time, location, home/away, result (match only), squad checkboxes from the roster, description.</td></tr>
+      <tr><td><code>ActionAdminList</code></td><td>Season-scoped list; edit hidden when the season is archived (server rejects too), delete stays available.</td></tr>
+      <tr><td><code>ActionTypeBadge</code></td><td>Action-type-colored pill using the <code>--action-*</code> token pairs (foreground variant for WCAG AA).</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="comp-timeline">
+  <h2>Timeline Components</h2>
+  <p class="section-desc"><code>src/components/timeline/</code> — the app's signature surface.</p>
+  <table>
+    <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>ActionCard</code></td><td>Variants: <code>next</code> (floodlight pulse ring), <code>upcoming</code> (muted), <code>past</code> (ticket-stub seam + notches), <code>detail</code> (adds description). Shows type badge, title, "vs. opponent", result score, date/time/location, squad chips, reactions. Receives all labels as props — no useTranslations inside.</td></tr>
+      <tr><td><code>PastActionsFeed</code></td><td>Cursor-paginated history (date + documentId tiebreak so same-day actions never skip/repeat at page boundaries) with a load-more Server Action.</td></tr>
+      <tr><td><code>UpcomingActionsList</code></td><td>Unpaginated upcoming fixtures (a season only has a handful ahead of it).</td></tr>
+      <tr><td><code>SquadChips</code></td><td>Called-up players as chips — renders <code>PlayerPublic</code> data only.</td></tr>
+      <tr><td><code>ReactionPicker</code></td><td>5-emoji picker with per-emoji counts; optimistic toggle, one reaction per user, replace-on-repick.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="comp-engage">
+  <h2>Comment &amp; Media Components</h2>
+  <p class="section-desc"><code>src/components/comments/</code> · <code>src/components/media/</code></p>
+  <table>
+    <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>CommentForm</code></td><td>Create top-level comments or replies; reply target banner with cancel.</td></tr>
+      <tr><td><code>CommentList</code></td><td>Pinned-first ordering, single-level threading (replies grouped under their top-level parent), pin/unpin (admin), delete (author or admin), report.</td></tr>
+      <tr><td><code>ActionMediaUploader</code></td><td>Admin-only image upload (max 5 MB) to <code>actions/{actionId}/</code>, then <code>createMediaAction</code>.</td></tr>
+      <tr><td><code>AddVideoLinkDialog</code></td><td>Admin-only YouTube/Vimeo URL form; validated client-side and again in <code>addVideoLinkAction</code> via the shared <code>getVideoEmbedUrl()</code>.</td></tr>
+      <tr><td><code>ActionMediaGallery</code></td><td>Pinned-first grid; images as square tiles, video links as 16:9 <code>youtube-nocookie</code>/Vimeo embeds spanning two columns; pin + delete (admin), report (everyone signed in).</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="comp-reports">
+  <h2>Report &amp; Notification Components</h2>
+  <p class="section-desc"><code>src/components/reports/</code> · <code>src/components/notifications/</code></p>
+  <table>
+    <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>ReportButton</code></td><td>Flag icon → reason picker (spam, harassment, inappropriate content, …) + optional details. Works on comments, media, teams, players.</td></tr>
+      <tr><td><code>ReportsAdminList</code></td><td>Pending queue with content preview + deep link; resolve / dismiss / remove-content ("content no longer available" when already gone; team reports only support resolve).</td></tr>
+      <tr><td><code>NotificationBell</code></td><td>Navbar dropdown: unread badge, recent items, mark-all-read, link to the full inbox.</td></tr>
+      <tr><td><code>NotificationList</code> / <code>NotificationRow</code></td><td>Paginated inbox rows; click marks read and navigates to the notification's URL.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="comp-ui">
+  <h2>UI Primitives (shadcn/ui on Base UI)</h2>
+  <p class="section-desc"><code>src/components/ui/</code> — do not hand-edit; re-run
+     <code>npx shadcn add &lt;component&gt;</code>. Built on <strong>Base UI</strong>
+     (<code>@base-ui/react</code>), not Radix — polymorphic composition uses the
+     <code>render</code> prop, not <code>asChild</code>.</p>
+  <div class="pill-list">
+    <span class="pill">alert-dialog</span><span class="pill">avatar</span><span class="pill">badge</span>
+    <span class="pill">button</span><span class="pill">card</span><span class="pill">checkbox</span>
+    <span class="pill">dialog</span><span class="pill">dropdown-menu</span><span class="pill">input</span>
+    <span class="pill">label</span><span class="pill">select</span><span class="pill">separator</span>
+    <span class="pill">skeleton</span><span class="pill">sonner</span><span class="pill">switch</span>
+  </div>
+</div>
+
+<!-- ─────────────────────────────── BUSINESS LOGIC ─────────────────────────────── -->
+<div class="section" id="lib-firebase">
+  <h2>Firebase Init</h2>
+  <p class="section-desc"><code>src/lib/firebase/</code></p>
+  <div class="two-col">
+    <div class="box">
+      <div class="box-title">client.ts (browser)</div>
+      <p>Client SDK init from <code>NEXT_PUBLIC_FIREBASE_*</code> env vars. Exports
+         <code>auth</code>, <code>storage</code>. Connects to the Local Emulator Suite when
+         <code>NEXT_PUBLIC_USE_FIREBASE_EMULATORS=true</code>.</p>
+    </div>
+    <div class="box">
+      <div class="box-title">admin.ts (server-only)</div>
+      <p>firebase-admin init (<code>import "server-only"</code> — importing it from client code
+         is a build error). Exports <code>adminAuth</code>, <code>adminFirestore</code>. Branches
+         on emulator env vars the same way.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="lib-auth">
+  <h2>Auth &amp; Session</h2>
+  <p class="section-desc"><code>src/lib/auth/</code> · <code>src/app/api/auth/session/route.ts</code></p>
+  <pre><span class="c">// The full sign-in flow</span>
+client SDK sign-in → getIdToken()
+  → POST /api/auth/session         <span class="c"># runtime = "nodejs" (firebase-admin isn't Edge-compatible)</span>
+      verify token → ensureUserProfile(uid) → mint httpOnly session cookie
+  → server components call getCurrentUser()   <span class="c"># src/lib/auth/session.ts — authoritative</span>
+  → src/proxy.ts                    <span class="c"># cookie *presence* check only, cheap early redirect</span></pre>
+  <table>
+    <thead><tr><th>Export</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>getCurrentUser()</code></td><td>Verifies the session cookie, returns the decoded user or null. Called from the <code>(app)</code> layout and any page needing auth.</td></tr>
+      <tr><td><code>requireUid()</code></td><td>Throws if unauthenticated — first line of every Server Action.</td></tr>
+      <tr><td><code>requireTeamAdmin(teamId)</code></td><td>(In admin <code>actions.ts</code>) <code>requireUid()</code> + <code>isTeamAdmin</code> check; returns the uid.</td></tr>
+      <tr><td><code>client-actions.ts</code></td><td>Client-side helpers: sign in/out and the session-cookie POST/DELETE round-trips.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="lib-repos">
+  <h2>Repositories</h2>
+  <p class="section-desc">All Firestore CRUD lives in <code>src/lib/*/**-repository.ts</code>
+     (Admin SDK, <code>import "server-only"</code>). One repository per collection.</p>
+
+  <h3>users/user-repository.ts</h3>
+  <pre>getUserProfile(uid) · ensureUserProfile(uid, …)     <span class="c"># idempotent set(merge:true)</span>
+updateUserProfile(uid, partial)
+followTeam(uid, teamId) · unfollowTeam(uid, teamId) <span class="c"># followedTeamIds array ops</span>
+registerFcmToken(uid, token) · pruning via Cloud Function
+updateNotificationPreferences(uid, prefs)           <span class="c"># categories default to true when absent</span></pre>
+
+  <h3>teams/*.ts</h3>
+  <pre>team-repository:          createTeam · getTeam · listTeamsForAdmin · updateTeam ·
+                          isTeamAdmin · removeTeamAdmin
+admin-invite-repository:  createInvite · getInvite · listInvitesForTeam · listInvitesForEmail ·
+                          acceptInvite (atomic status flip + adminUids join, re-verifies the
+                          caller's verified email) · declineInvite · revokeInvite
+follow-invite-repository: same shape — accepting calls followTeam instead</pre>
+
+  <h3>seasons/season-repository.ts</h3>
+  <pre>createSeason      <span class="c"># first season for a team auto-activates</span>
+listSeasonsForTeam · getSeason · getActiveSeason · updateSeason
+deleteSeason      <span class="c"># throws if the season still has actions (the one cross-repo call)</span>
+setActiveSeason   <span class="c"># transaction: unsets any other active season; refuses archived</span>
+setSeasonArchived <span class="c"># archiving the active season also deactivates it</span></pre>
+
+  <h3>actions/action-repository.ts</h3>
+  <pre>createAction · getAction · updateAction · deleteAction
+listActionsForSeason · listUpcomingActionsForSeason      <span class="c"># date >= today, unpaginated</span>
+listPastActionsForSeasonPage({ pageSize, cursor })       <span class="c"># date desc + documentId() tiebreak</span>
+setReaction(actionId, uid, type | null)                  <span class="c"># single dot-path update / field delete</span></pre>
+
+  <h3>comments · media · reports · notifications</h3>
+  <pre>comment-repository:      createComment (parentCommentId for replies) · listCommentsForAction ·
+                         deleteComment · setCommentPinned
+media-repository:        createMedia(kind: "image" | "videoLink") · listMediaForAction ·
+                         setMediaPinned · deleteMedia      <span class="c"># defensive kind/isPinned defaults</span>
+report-repository:       createReport · getReport · listReportsForTeam · resolveReport ·
+                         dismissReport                     <span class="c"># report-preview.ts builds admin previews</span>
+notification-repository: listNotificationsPage · getUnreadCount · markRead · markAllRead
+                         <span class="c"># create/delete are Cloud-Function-only (rules: allow create, delete: if false)</span></pre>
+</div>
+
+<div class="section" id="lib-youth">
+  <h2>Youth Privacy Engine</h2>
+  <p class="section-desc"><code>src/lib/players/</code> — load-bearing, not a style choice.</p>
+  <div class="box">
+    <div class="box-title">youth.ts + player-repository.ts</div>
+    <p><code>YOUTH_AGE_THRESHOLD = 18</code> (a constant today; placeholder for Remote Config).
+       <code>isYouth</code> is computed from <code>birthdate</code> server-side and re-checked on
+       <em>every</em> write; whenever it's true the repository forces <code>avatarURL</code> to
+       null regardless of client input. Public data (<code>PlayerPublic</code>: pseudonym, jersey
+       number, isYouth flag) lives in <code>players/{id}</code>; real name and birthdate live in
+       <code>players/{id}/private/profile</code>, readable only by that team's admins. Any new
+       surface that shows a player must consume <code>PlayerPublic</code> — never re-derive a
+       "safe" view ad hoc.</p>
+  </div>
+</div>
+
+<div class="section" id="lib-media">
+  <h2>Media &amp; Video Links</h2>
+  <p class="section-desc"><code>src/lib/media/video-url.ts</code> — shared client + server (no
+     <code>"server-only"</code>).</p>
+  <pre>getVideoEmbedUrl(rawUrl) → string | null
+<span class="c">// Accepts only https YouTube (watch, youtu.be, shorts, embed, live, music) and Vimeo URLs.</span>
+<span class="c">// Returns a youtube-nocookie.com / player.vimeo.com embed URL, or null.</span>
+<span class="c">// Used for BOTH validation (form + Server Action) and rendering (gallery iframes).</span>
+<span class="c">// Unknown hosts are rejected at write time — embedding arbitrary user URLs on a</span>
+<span class="c">// public page would be a phishing vector.</span></pre>
+</div>
+
+<!-- ─────────────────────────────── INFRASTRUCTURE ─────────────────────────────── -->
+<div class="section" id="types">
+  <h2>Types</h2>
+  <p class="section-desc"><code>src/lib/types/</code> — one file per domain entity. Timestamps are
+     <code>firebase-admin</code> Timestamps; strip them with <code>omit(x, "createdAt",
+     "updatedAt")</code> before passing to Client Components.</p>
+  <div class="two-col">
+    <pre><span class="c">// Entities</span>
+UserProfile        <span class="c"># + NotificationPreferences</span>
+Team               <span class="c"># adminUids, colors, socialLinks</span>
+TeamAdminInvite · TeamFollowInvite
+PlayerPublic · PlayerPrivate
+Season             <span class="c"># startDate/endDate, isActive, isArchived</span>
+Action · ActionResult
+Comment            <span class="c"># parentCommentId, isPinned</span>
+Media              <span class="c"># kind, isPinned</span>
+Report
+NotificationDoc</pre>
+    <pre><span class="c">// Unions</span>
+ActionType   = "match" | "training" | "tournament"
+             | "cup" | "other"
+ReactionType = "great" | "fire" | "applause"
+             | "love" | "laugh"    <span class="c"># ⚽🔥👏❤️😂</span>
+MediaKind    = "image" | "videoLink"
+ReportContentType = "comment" | "media"
+             | "team" | "player"
+NotificationCategory = actionCreated | actionUpdated
+             | adminInvite | followInvite | commentReply</pre>
+  </div>
+</div>
+
+<div class="section" id="i18n">
+  <h2>i18n</h2>
+  <p class="section-desc">next-intl 4. English default, Czech secondary. Locale always in the URL.</p>
+  <table>
+    <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>src/proxy.ts</code></td><td>Composes next-intl locale middleware with the auth-cookie presence check — Next.js 16 allows one proxy export, and it MUST be <code>proxy.ts</code>, not <code>middleware.ts</code>.</td></tr>
+      <tr><td><code>src/i18n/routing.ts</code></td><td><code>locales: ["en", "cs"]</code>, <code>defaultLocale: "en"</code>.</td></tr>
+      <tr><td><code>src/i18n/navigation.ts</code></td><td>Locale-aware <code>Link</code>/<code>useRouter</code>/<code>redirect</code> — always import from here, not <code>next/link</code>/<code>next/navigation</code>, for locale-prefixed hrefs.</td></tr>
+      <tr><td><code>src/messages/en.json · cs.json</code></td><td>Message catalogs — key sets must stay identical. Namespaces: common, nav, auth, profile, teams, players, seasons, actions, timeline, comments, media, reports, notifications.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" id="firebase-config">
+  <h2>Firebase Configuration</h2>
+  <p class="section-desc">The Local Emulator Suite is the default dev target — no real project needed.</p>
+  <pre><span class="c"># Local development</span>
+npm install
+cp .env.local.example .env.local     <span class="c"># ships emulator-ready demo values</span>
+firebase emulators:start             <span class="c"># terminal 1</span>
+npm run dev                          <span class="c"># terminal 2</span></pre>
+  <table>
+    <thead><tr><th>Emulator</th><th>Port</th></tr></thead>
+    <tbody>
+      <tr><td>Auth</td><td><code>9099</code></td></tr>
+      <tr><td>Firestore</td><td><code>8080</code></td></tr>
+      <tr><td>Storage</td><td><code>9199</code></td></tr>
+      <tr><td>Functions</td><td><code>5001</code></td></tr>
+      <tr><td>Emulator UI</td><td><code>4000</code></td></tr>
+    </tbody>
+  </table>
+  <p>Client env vars use the <code>NEXT_PUBLIC_FIREBASE_*</code> prefix;
+     <code>NEXT_PUBLIC_USE_FIREBASE_EMULATORS=true</code> flips both SDKs to the emulators.
+     See <code>README.md</code> for connecting a real project.</p>
+</div>
+
+<div class="section" id="security">
+  <h2>Security Rules</h2>
+  <p class="section-desc">Defense-in-depth: Server Actions with the Admin SDK bypass these, but
+     the rules encode the intended model. Keep both layers in sync.</p>
+
+  <h3>Firestore (<code>firestore.rules</code>)</h3>
+  <div class="hl">
+    <strong>players/{playerId} + private subdoc</strong>
+    <span>Public doc world-readable; <code>private/profile</code> readable only via
+    <code>isTeamAdmin()</code>. The document split IS the privacy mechanism.</span>
+  </div>
+  <div class="hl">
+    <strong>teams / seasons / actions / media</strong>
+    <span>Read: public. Create/update/delete: <code>isTeamAdmin(teamId)</code> (flat check —
+    real writes never go through rules anyway).</span>
+  </div>
+  <div class="hl">
+    <strong>comments</strong>
+    <span>Create: signed-in author only. Update (pinning): team admin. Delete: author or admin.</span>
+  </div>
+  <div class="hl">
+    <strong>users/{uid}/notifications</strong>
+    <span>Read/mark-read: owner only. <code>allow create, delete: if false</code> — Cloud
+    Functions (Admin SDK) are the only writers.</span>
+  </div>
+  <div class="hl">
+    <strong>reports</strong>
+    <span>Create: signed-in reporter with <code>status == "pending"</code>. Read/resolve: the
+    reported team's admins (or the reporter reading their own).</span>
+  </div>
+</div>
+
+<div class="section" id="functions">
+  <h2>Cloud Functions</h2>
+  <p class="section-desc"><code>functions/src/index.ts</code> — separate package, Firestore
+     triggers v2. All five funnel through the shared <code>notifyUsers()</code> helper.</p>
+  <table>
+    <thead><tr><th>Function</th><th>Trigger</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>onActionCreated</code></td><td>onCreate <code>actions/{id}</code></td><td>Notifies every follower of the team (excludes the creator).</td></tr>
+      <tr><td><code>onActionUpdated</code></td><td>onUpdate <code>actions/{id}</code></td><td>Diffs <code>MEANINGFUL_ACTION_FIELDS</code> (title, type, opponent, date, time, location, competition, isHome, result, description) so reactions/squad tweaks don't spam; excludes the editor via <code>updatedBy</code>.</td></tr>
+      <tr><td><code>onAdminInviteCreated</code></td><td>onCreate <code>teamAdminInvites/{id}</code></td><td>Email → <code>getUserByEmail</code>; silently no-ops if that email has no account yet.</td></tr>
+      <tr><td><code>onFollowInviteCreated</code></td><td>onCreate <code>teamFollowInvites/{id}</code></td><td>Same email matching for follow invites.</td></tr>
+      <tr><td><code>onCommentCreated</code></td><td>onCreate <code>comments/{id}</code></td><td>Only fires for genuine replies (<code>parentCommentId</code> set); skips self-replies.</td></tr>
+    </tbody>
+  </table>
+  <div class="box" style="margin-top:14px">
+    <div class="box-title">notifyUsers() — two independent gates</div>
+    <p>1. Per-category gate (<code>notificationPreferences.categories</code>): a disabled category
+       skips the in-app inbox write entirely, not just push.<br>
+       2. Channel gate (<code>notificationPreferences.push</code>): controls FCM multicast only.
+       Invalid/expired tokens are pruned from the user doc after each send. The
+       <code>email</code> channel switch exists on the shape but no email is sent yet (backlog).</p>
+  </div>
+</div>
+
+<div class="section" id="patterns">
+  <h2>Patterns &amp; Gotchas</h2>
+
+  <h3>Base UI composition — render prop, never asChild</h3>
+  <div class="box">
+    <div class="box-title">shadcn here is built on Base UI, not Radix</div>
+    <pre><span class="c">// WRONG — Button's children are discarded when render is set</span>
+&lt;Button render={&lt;Link href="/teams/new" /&gt;}&gt;Create&lt;/Button&gt;
+
+<span class="c">// CORRECT — the label lives on the element inside render</span>
+&lt;Button render={&lt;Link href="/teams/new"&gt;Create&lt;/Link&gt;} /&gt;</pre>
+  </div>
+
+  <h3>Never <code>export type</code> from a "use server" file</h3>
+  <div class="box">
+    <div class="box-title">Breaks every Server Action app-wide, invisible to tsc/eslint/build</div>
+    <p>Files with <code>"use server"</code> may only export async functions. A type re-export
+       poisons the module at runtime even though all static checks pass. Keep shared types in
+       <code>src/lib/types/</code> and import them where needed.</p>
+  </div>
+
+  <h3>This is NOT the Next.js you know</h3>
+  <div class="box">
+    <div class="box-title">Next.js 16 — check node_modules/next/dist/docs before assuming an API</div>
+    <p>Breaking changes vs. training-data-era Next.js. Example already hit:
+       <code>middleware.ts</code> was replaced by <code>proxy.ts</code>. See <code>AGENTS.md</code>.</p>
+  </div>
+
+  <h3>Timestamps never cross the client boundary</h3>
+  <div class="box">
+    <div class="box-title">Strip with omit() before passing to Client Components</div>
+    <p>Firestore <code>Timestamp</code> instances can't serialize into Client Component props.
+       Every page maps entities through <code>omit(entity, "createdAt", "updatedAt")</code> and
+       components declare <code>ClientSafeX = Omit&lt;X, "createdAt" | "updatedAt"&gt;</code>.</p>
+  </div>
+
+  <h3>No router.refresh() after router.push()</h3>
+  <div class="box">
+    <div class="box-title">Confirmed via live testing</div>
+    <p>Calling <code>refresh()</code> immediately after <code>push()</code> interrupts the
+       in-flight transition. A push to a route not in the router cache already fetches a fresh
+       RSC payload. (Standalone <code>router.refresh()</code> after an in-place mutation is the
+       normal pattern.)</p>
+  </div>
+
+  <h3>Opacity with CSS-variable colors</h3>
+  <div class="box">
+    <div class="box-title">bg-primary/50 breaks with oklch tokens</div>
+    <p>Use <code>color-mix(in oklch, var(--token) 50%, transparent)</code>. See APP_DESIGN.md.</p>
+  </div>
+
+  <h3>Defensive read, no migration scripts</h3>
+  <div class="box">
+    <div class="box-title">Pre-launch schema convention</div>
+    <p>Renames are full replaces (<code>likedByUids</code> → <code>reactions</code>,
+       <code>notes</code> → <code>description</code>); newer optional fields get defaults at the
+       repository read layer (<code>kind: "image"</code>, <code>isPinned: false</code>,
+       <code>isArchived: false</code>). Read via <code>action.reactions ?? {}</code>-style
+       fallbacks in older call sites.</p>
+  </div>
+
+  <h3>Youth privacy in every new feature</h3>
+  <div class="box">
+    <div class="box-title">Reuse PlayerPublic — never re-derive a "safe" view</div>
+    <p>Any comment/media/timeline work that surfaces a player must consume
+       <code>PlayerPublic</code>. Youth players: pseudonym only, no photo, no personal info in
+       public views, <code>YouthPrivacyBadge</code> where identity could leak.</p>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('[id]');
+  const links = document.querySelectorAll('.nav-link');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

@@ -7,27 +7,23 @@ import {
   markAllNotificationsRead,
   markNotificationRead,
   NOTIFICATIONS_PAGE_SIZE,
+  toClientNotification,
+  type ClientNotification,
   type NotificationPageCursor,
 } from "@/lib/notifications/notification-repository";
-import type { AppNotification } from "@/lib/types/notification";
-import { omit } from "@/lib/utils/omit";
 
-// createdAt kept as an ISO string (same convention as ReportSummary.createdAt
-// in ReportsAdminList) rather than dropped outright — a Timestamp instance
-// can't cross the Server Action boundary, but the inbox still needs to show
-// when each notification arrived.
-export type ClientNotification = Omit<AppNotification, "createdAt"> & { createdAt: string };
+// NOT re-exported from here: a "use server" file's transform mishandles
+// `export type { X }` re-exports — it generates a runtime binding for `X`
+// with nothing to initialize it, throwing `ReferenceError: X is not defined`
+// at module evaluation. Since this Navbar-adjacent module (via
+// NotificationBell) gets pulled into every page's Server Action bundle,
+// that error broke every Server Action on every page, not just this one.
+// Consumers must import ClientNotification directly from
+// notification-repository.ts instead.
 
 export interface ClientNotificationPage {
   notifications: ClientNotification[];
   nextCursor: NotificationPageCursor | null;
-}
-
-function toClientNotification(notification: AppNotification): ClientNotification {
-  return {
-    ...omit(notification, "createdAt"),
-    createdAt: notification.createdAt.toDate().toISOString(),
-  };
 }
 
 // Small first page for the Navbar dropdown, refreshed on demand (opened),

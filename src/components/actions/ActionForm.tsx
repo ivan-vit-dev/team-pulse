@@ -32,6 +32,7 @@ const HOME_AWAY_TYPES: ActionType[] = ["match", "tournament", "cup"];
 const schema = z.object({
   type: z.enum(["match", "training", "tournament", "cup", "other"]),
   title: z.string().min(1),
+  opponent: z.string(),
   competition: z.string(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
   time: z.union([z.string().regex(/^\d{2}:\d{2}$/, "Use HH:MM"), z.literal("")]),
@@ -39,7 +40,7 @@ const schema = z.object({
   isHome: z.boolean(),
   ourScore: z.number().int().min(0).nullable(),
   theirScore: z.number().int().min(0).nullable(),
-  notes: z.string(),
+  description: z.string(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -80,6 +81,7 @@ export function ActionForm({ teamId, seasonId, roster, action }: ActionFormProps
     defaultValues: {
       type: action?.type ?? "match",
       title: action?.title ?? "",
+      opponent: action?.opponent ?? "",
       competition: action?.competition ?? "",
       date: action?.date ?? "",
       time: action?.time ?? "",
@@ -87,13 +89,14 @@ export function ActionForm({ teamId, seasonId, roster, action }: ActionFormProps
       isHome: action?.isHome ?? true,
       ourScore: action?.result?.ourScore ?? null,
       theirScore: action?.result?.theirScore ?? null,
-      notes: action?.notes ?? "",
+      description: action?.description ?? "",
     },
   });
 
   const type = watch("type");
   const isHome = watch("isHome");
   const showHomeAway = HOME_AWAY_TYPES.includes(type);
+  const showOpponent = HOME_AWAY_TYPES.includes(type);
   const showResult = type === "match";
 
   function toggleSquadPlayer(playerId: string) {
@@ -114,6 +117,7 @@ export function ActionForm({ teamId, seasonId, roster, action }: ActionFormProps
         seasonId,
         type: values.type,
         title: values.title,
+        opponent: showOpponent ? values.opponent || null : null,
         competition: values.competition || null,
         date: values.date,
         time: values.time || null,
@@ -121,7 +125,7 @@ export function ActionForm({ teamId, seasonId, roster, action }: ActionFormProps
         isHome: showHomeAway ? values.isHome : null,
         result,
         squadPlayerIds,
-        notes: values.notes || null,
+        description: values.description || null,
       };
 
       if (action) {
@@ -167,6 +171,13 @@ export function ActionForm({ teamId, seasonId, roster, action }: ActionFormProps
         <Input id="title" placeholder={t("titlePlaceholder")} {...register("title")} />
         {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
       </div>
+
+      {showOpponent && (
+        <div className="space-y-1.5">
+          <Label htmlFor="opponent">{t("opponent")}</Label>
+          <Input id="opponent" placeholder={t("opponentPlaceholder")} {...register("opponent")} />
+        </div>
+      )}
 
       <div className="space-y-1.5">
         <Label htmlFor="competition">{t("competition")}</Label>
@@ -250,8 +261,8 @@ export function ActionForm({ teamId, seasonId, roster, action }: ActionFormProps
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="notes">{t("notes")}</Label>
-        <Input id="notes" {...register("notes")} />
+        <Label htmlFor="description">{t("description")}</Label>
+        <Input id="description" {...register("description")} />
       </div>
 
       <Button type="submit" disabled={isSubmitting}>

@@ -22,6 +22,28 @@ export interface NotificationPage {
   nextCursor: NotificationPageCursor | null;
 }
 
+// createdAt kept as an ISO string (same convention as ReportSummary.createdAt
+// in ReportsAdminList) rather than dropped outright — a Timestamp instance
+// can't cross the Server Action/Server Component boundary, but the inbox
+// still needs to show when each notification arrived.
+//
+// A plain `Omit<AppNotification, "createdAt">` does NOT distribute over the
+// union (keyof a union only sees fields common to every member), which would
+// silently collapse this to just {id, type, isRead} and drop
+// actionId/inviteId/commentId etc. This conditional type is distributive
+// because T is a naked type parameter, so it maps over each union member
+// individually instead.
+type WithStringCreatedAt<T> = T extends { createdAt: unknown }
+  ? Omit<T, "createdAt"> & { createdAt: string }
+  : T;
+
+export type ClientNotification = WithStringCreatedAt<AppNotification>;
+
+export function toClientNotification(notification: AppNotification): ClientNotification {
+  const { createdAt, ...rest } = notification;
+  return { ...rest, createdAt: createdAt.toDate().toISOString() } as ClientNotification;
+}
+
 // documentId() tiebreak for the same reason listPastActionsForSeasonPage uses
 // one: multiple notifications can share a createdAt (a batch write from one
 // onActionCreated fan-out all get the same server timestamp), and

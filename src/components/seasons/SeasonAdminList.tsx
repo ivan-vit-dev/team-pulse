@@ -6,8 +6,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import {
+  archiveSeasonAction,
   deleteSeasonAction,
   setActiveSeasonAction,
+  unarchiveSeasonAction,
 } from "@/app/[locale]/(app)/teams/[teamId]/admin/actions";
 import {
   AlertDialog,
@@ -63,6 +65,22 @@ export function SeasonAdminList({ teamId, seasons }: SeasonAdminListProps) {
     }
   }
 
+  async function handleToggleArchived(season: ClientSafeSeason) {
+    setPendingId(season.id);
+    try {
+      if (season.isArchived) {
+        await unarchiveSeasonAction(season.id);
+      } else {
+        await archiveSeasonAction(season.id);
+      }
+      router.refresh();
+    } catch {
+      toast.error(ta("genericError"));
+    } finally {
+      setPendingId(null);
+    }
+  }
+
   if (seasons.length === 0) {
     return <p className="text-sm text-muted-foreground">{t("noSeasonsYet")}</p>;
   }
@@ -71,12 +89,20 @@ export function SeasonAdminList({ teamId, seasons }: SeasonAdminListProps) {
     <div className="divide-y divide-border">
       {seasons.map((season) => (
         <div key={season.id} className="flex items-center justify-between gap-3 py-3">
-          <div className="flex items-center gap-2">
-            <span className="font-medium">{season.name}</span>
-            {season.isActive && <Badge>{t("active")}</Badge>}
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <span className="font-medium">{season.name}</span>
+              {season.isActive && <Badge>{t("active")}</Badge>}
+              {season.isArchived && <Badge variant="outline">{t("archived")}</Badge>}
+            </div>
+            {(season.startDate || season.endDate) && (
+              <p className="text-xs text-muted-foreground">
+                {season.startDate ?? "…"} – {season.endDate ?? "…"}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-2">
-            {!season.isActive && (
+            {!season.isActive && !season.isArchived && (
               <Button
                 variant="outline"
                 size="sm"
@@ -86,6 +112,14 @@ export function SeasonAdminList({ teamId, seasons }: SeasonAdminListProps) {
                 {t("setActive")}
               </Button>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={pendingId === season.id}
+              onClick={() => handleToggleArchived(season)}
+            >
+              {season.isArchived ? t("unarchive") : t("archive")}
+            </Button>
             <Button
               variant="outline"
               size="sm"

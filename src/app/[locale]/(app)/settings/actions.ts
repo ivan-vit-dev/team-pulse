@@ -19,6 +19,13 @@ export async function updateProfileAction(input: z.infer<typeof profileSchema>) 
 const notificationPrefsSchema = z.object({
   email: z.boolean(),
   push: z.boolean(),
+  categories: z.object({
+    newAction: z.boolean(),
+    actionUpdated: z.boolean(),
+    adminInvite: z.boolean(),
+    commentReply: z.boolean(),
+    followInvite: z.boolean(),
+  }),
 });
 
 export async function updateNotificationPrefsAction(

@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Compiled Cloud Functions output (functions/src is the source).
+    "functions/lib/**",
+    // Throwaway local verification scripts.
+    "*.tmp.js",
   ]),
 ]);
 

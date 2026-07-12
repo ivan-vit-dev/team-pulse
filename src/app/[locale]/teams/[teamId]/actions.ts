@@ -4,10 +4,9 @@ import { z } from "zod";
 
 import {
   getAction,
-  likeAction,
   listPastActionsForSeasonPage,
   PAST_ACTIONS_PAGE_SIZE,
-  unlikeAction,
+  setReaction,
   type ActionPageCursor,
 } from "@/lib/actions/action-repository";
 import { requireUid } from "@/lib/auth/require-uid";
@@ -21,7 +20,7 @@ import { getMedia } from "@/lib/media/media-repository";
 import { getPlayerPublic } from "@/lib/players/player-repository";
 import { createReport } from "@/lib/reports/report-repository";
 import { getTeam, isTeamAdmin } from "@/lib/teams/team-repository";
-import type { Action } from "@/lib/types/action";
+import type { Action, ReactionType } from "@/lib/types/action";
 import type { Comment } from "@/lib/types/comment";
 import type { ReportContentType } from "@/lib/types/report";
 import { followTeam, getUserProfile, unfollowTeam } from "@/lib/users/user-repository";
@@ -62,16 +61,14 @@ export async function unfollowTeamAction(teamId: string): Promise<void> {
   await unfollowTeam(uid, teamId);
 }
 
-export async function likeActionAction(actionId: string): Promise<void> {
+export async function setReactionAction(
+  actionId: string,
+  type: ReactionType | null,
+): Promise<void> {
   const uid = await requireUid();
   const action = await getAction(actionId);
   if (!action) throw new Error("Action not found");
-  await likeAction(actionId, uid);
-}
-
-export async function unlikeActionAction(actionId: string): Promise<void> {
-  const uid = await requireUid();
-  await unlikeAction(actionId, uid);
+  await setReaction(actionId, uid, type);
 }
 
 const commentTextSchema = z.string().trim().min(1).max(500);
@@ -82,11 +79,24 @@ export async function createCommentAction(
   actionId: string,
   teamId: string,
   text: string,
+  parentCommentId: string | null = null,
 ): Promise<ClientComment> {
   const uid = await requireUid();
   const parsedText = commentTextSchema.parse(text);
   const profile = await getUserProfile(uid);
   if (!profile) throw new Error("User profile not found");
+
+  // Don't trust a client-supplied parentCommentId blindly — same posture as
+  // resolveTeamIdForReportedContent below: verify it actually belongs to this
+  // action before writing, so a reply can't be mis-attached to someone else's
+  // thread on a different action.
+  if (parentCommentId) {
+    const parent = await getComment(parentCommentId);
+    if (!parent || parent.actionId !== actionId) {
+      throw new Error("Parent comment not found on this action");
+    }
+  }
+
   const commentId = await createComment(
     actionId,
     teamId,
@@ -94,6 +104,7 @@ export async function createCommentAction(
     profile.displayName,
     profile.photoURL,
     parsedText,
+    parentCommentId,
   );
   const comment = await getComment(commentId);
   if (!comment) throw new Error("Comment not found after creation");

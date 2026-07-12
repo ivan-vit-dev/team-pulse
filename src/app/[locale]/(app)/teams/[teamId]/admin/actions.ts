@@ -10,7 +10,8 @@ import {
 } from "@/lib/actions/action-repository";
 import { requireUid } from "@/lib/auth/require-uid";
 import { deleteComment } from "@/lib/comments/comment-repository";
-import { createMedia, deleteMedia, getMedia } from "@/lib/media/media-repository";
+import { createMedia, deleteMedia, getMedia, setMediaPinned } from "@/lib/media/media-repository";
+import { getVideoEmbedUrl } from "@/lib/media/video-url";
 import {
   getPlayerPublic,
   listPlayersForTeam,
@@ -29,6 +30,7 @@ import {
   deleteSeason as deleteSeasonRepo,
   getSeason,
   setActiveSeason as setActiveSeasonRepo,
+  setSeasonArchived as setSeasonArchivedRepo,
   updateSeason as updateSeasonRepo,
 } from "@/lib/seasons/season-repository";
 import {
@@ -36,6 +38,11 @@ import {
   getInvite,
   revokeInvite as revokeInviteRepo,
 } from "@/lib/teams/admin-invite-repository";
+import {
+  createInvite as createFollowInviteRepo,
+  getInvite as getFollowInviteRepo,
+  revokeInvite as revokeFollowInviteRepo,
+} from "@/lib/teams/follow-invite-repository";
 import {
   isTeamAdmin,
   removeTeamAdmin,
@@ -103,6 +110,23 @@ export async function removeAdminAction(teamId: string, uidToRemove: string) {
   await removeTeamAdmin(teamId, uidToRemove);
 }
 
+const inviteFanSchema = z.object({ email: z.email() });
+
+export async function inviteFanAction(teamId: string, input: { email: string }) {
+  const uid = await requireTeamAdmin(teamId);
+  const { email } = inviteFanSchema.parse(input);
+  await createFollowInviteRepo(teamId, email, uid);
+}
+
+export async function revokeFollowInviteAction(teamId: string, inviteId: string) {
+  await requireTeamAdmin(teamId);
+  const invite = await getFollowInviteRepo(inviteId);
+  if (!invite || invite.teamId !== teamId) {
+    throw new Error("Invite not found for this team");
+  }
+  await revokeFollowInviteRepo(inviteId);
+}
+
 const playerSchema = z.object({
   displayName: z.string().min(1),
   jerseyNumber: z.number().int().min(0).max(99).nullable(),
@@ -154,9 +178,19 @@ export async function updatePlayerAvatarAction(playerId: string, avatarURL: stri
   await updatePlayerAvatarRepo(playerId, avatarURL);
 }
 
-const seasonSchema = z.object({
-  name: z.string().min(2).max(20),
-});
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD");
+
+const seasonSchema = z
+  .object({
+    name: z.string().min(2).max(20),
+    startDate: isoDate.nullable(),
+    endDate: isoDate.nullable(),
+  })
+  .refine(
+    // ISO yyyy-mm-dd strings compare correctly as plain strings.
+    (season) => !season.startDate || !season.endDate || season.startDate <= season.endDate,
+    { message: "End date must not be before the start date", path: ["endDate"] },
+  );
 
 export async function createSeasonAction(
   teamId: string,
@@ -194,6 +228,20 @@ export async function setActiveSeasonAction(seasonId: string) {
   await setActiveSeasonRepo(season.teamId, seasonId);
 }
 
+export async function archiveSeasonAction(seasonId: string) {
+  const season = await getSeason(seasonId);
+  if (!season) throw new Error("Season not found");
+  await requireTeamAdmin(season.teamId);
+  await setSeasonArchivedRepo(seasonId, true);
+}
+
+export async function unarchiveSeasonAction(seasonId: string) {
+  const season = await getSeason(seasonId);
+  if (!season) throw new Error("Season not found");
+  await requireTeamAdmin(season.teamId);
+  await setSeasonArchivedRepo(seasonId, false);
+}
+
 const actionTypeEnum = z.enum(["match", "training", "tournament", "cup", "other"]);
 
 const actionResultSchema = z
@@ -204,6 +252,7 @@ const actionSchema = z.object({
   seasonId: z.string().min(1),
   type: actionTypeEnum,
   title: z.string().min(1),
+  opponent: z.string().nullable(),
   competition: z.string().nullable(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
   time: z
@@ -214,14 +263,18 @@ const actionSchema = z.object({
   isHome: z.boolean().nullable(),
   result: actionResultSchema,
   squadPlayerIds: z.array(z.string()),
-  notes: z.string().nullable(),
+  description: z.string().nullable(),
 });
 
-/** Throws if `seasonId` doesn't belong to `teamId`, or a squad id isn't on that team's roster. */
+/** Throws if `seasonId` doesn't belong to `teamId`, is archived (closed for
+ *  new content — FR-21), or a squad id isn't on that team's roster. */
 async function assertValidActionInput(teamId: string, parsed: z.infer<typeof actionSchema>) {
   const season = await getSeason(parsed.seasonId);
   if (!season || season.teamId !== teamId) {
     throw new Error("Season not found for this team");
+  }
+  if (season.isArchived) {
+    throw new Error("Season is archived — unarchive it to add or edit actions");
   }
 
   const roster = await listPlayersForTeam(teamId);
@@ -248,10 +301,10 @@ export async function updateActionAction(
 ) {
   const action = await getAction(actionId);
   if (!action) throw new Error("Action not found");
-  await requireTeamAdmin(action.teamId);
+  const uid = await requireTeamAdmin(action.teamId);
   const parsed = actionSchema.parse(input);
   await assertValidActionInput(action.teamId, parsed);
-  await updateActionRepo(actionId, parsed);
+  await updateActionRepo(actionId, parsed, uid);
 }
 
 export async function deleteActionAction(actionId: string) {
@@ -267,7 +320,21 @@ export async function createMediaAction(
   url: string,
 ): Promise<{ mediaId: string }> {
   const uid = await requireTeamAdmin(teamId);
-  const mediaId = await createMedia(actionId, teamId, uid, url);
+  const mediaId = await createMedia(actionId, teamId, uid, url, "image");
+  return { mediaId };
+}
+
+export async function addVideoLinkAction(
+  actionId: string,
+  teamId: string,
+  url: string,
+): Promise<{ mediaId: string }> {
+  const uid = await requireTeamAdmin(teamId);
+  const parsedUrl = z.string().trim().parse(url);
+  if (getVideoEmbedUrl(parsedUrl) === null) {
+    throw new Error("Not a supported video URL");
+  }
+  const mediaId = await createMedia(actionId, teamId, uid, parsedUrl, "videoLink");
   return { mediaId };
 }
 
@@ -276,6 +343,20 @@ export async function deleteMediaAction(mediaId: string): Promise<void> {
   if (!media) throw new Error("Media not found");
   await requireTeamAdmin(media.teamId);
   await deleteMedia(mediaId);
+}
+
+export async function pinMediaAction(mediaId: string): Promise<void> {
+  const media = await getMedia(mediaId);
+  if (!media) throw new Error("Media not found");
+  await requireTeamAdmin(media.teamId);
+  await setMediaPinned(mediaId, true);
+}
+
+export async function unpinMediaAction(mediaId: string): Promise<void> {
+  const media = await getMedia(mediaId);
+  if (!media) throw new Error("Media not found");
+  await requireTeamAdmin(media.teamId);
+  await setMediaPinned(mediaId, false);
 }
 
 export async function dismissReportAction(reportId: string): Promise<void> {

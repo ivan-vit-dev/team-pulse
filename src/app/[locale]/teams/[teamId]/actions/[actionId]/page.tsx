@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 import { CommentList } from "@/components/comments/CommentList";
 import { ActionMediaGallery } from "@/components/media/ActionMediaGallery";
 import { ActionMediaUploader } from "@/components/media/ActionMediaUploader";
+import { AddVideoLinkDialog } from "@/components/media/AddVideoLinkDialog";
 import { ActionCard } from "@/components/timeline/ActionCard";
-import { LikeButton } from "@/components/timeline/LikeButton";
+import { ReactionPicker } from "@/components/timeline/ReactionPicker";
 import { Link } from "@/i18n/navigation";
 import { getAction } from "@/lib/actions/action-repository";
+import { getReactionCounts } from "@/lib/actions/reaction-utils";
 import { getCurrentUser } from "@/lib/auth/session";
 import { listCommentsForAction } from "@/lib/comments/comment-repository";
 import { listMediaForAction } from "@/lib/media/media-repository";
@@ -64,17 +66,22 @@ export default async function ActionDetailPage({
       />
 
       {user && (
-        <LikeButton
+        <ReactionPicker
           actionId={action.id}
-          initialIsLiked={action.likedByUids?.includes(user.uid) ?? false}
-          initialCount={action.likedByUids?.length ?? 0}
+          initialCounts={getReactionCounts(action.reactions ?? {})}
+          initialMyReaction={(action.reactions ?? {})[user.uid] ?? null}
         />
       )}
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg font-bold">{tm("title")}</h2>
-          {isAdmin && <ActionMediaUploader actionId={actionId} teamId={teamId} />}
+          {isAdmin && (
+            <div className="flex gap-2">
+              <AddVideoLinkDialog actionId={actionId} teamId={teamId} />
+              <ActionMediaUploader actionId={actionId} teamId={teamId} />
+            </div>
+          )}
         </div>
         <ActionMediaGallery
           media={media.map((item) => omit(item, "createdAt"))}

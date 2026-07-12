@@ -6,11 +6,14 @@ import { useEffect, useRef, useState } from "react";
 import {
   loadMoreNotificationsAction,
   markNotificationReadAction,
-  type ClientNotification,
 } from "@/app/[locale]/(app)/notifications/actions";
 import { NotificationRow } from "@/components/notifications/NotificationRow";
 import { Link } from "@/i18n/navigation";
-import type { NotificationPageCursor } from "@/lib/notifications/notification-repository";
+import { notificationHref } from "@/lib/notifications/notification-href";
+import type {
+  ClientNotification,
+  NotificationPageCursor,
+} from "@/lib/notifications/notification-repository";
 
 interface NotificationListProps {
   initialNotifications: ClientNotification[];
@@ -58,7 +61,7 @@ export function NotificationList({ initialNotifications, initialCursor }: Notifi
       {notifications.map((notification) => (
         <Link
           key={notification.id}
-          href={`/teams/${notification.teamId}/actions/${notification.actionId}`}
+          href={notificationHref(notification)}
           onClick={() => handleOpen(notification.id)}
           className="block rounded-lg p-3 transition-colors hover:bg-muted"
         >

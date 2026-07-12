@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import {
   listNotificationsPage,
   NOTIFICATIONS_PAGE_SIZE,
+  toClientNotification,
 } from "@/lib/notifications/notification-repository";
 
 export default async function NotificationsPage() {
@@ -17,10 +18,7 @@ export default async function NotificationsPage() {
   }
 
   const page = await listNotificationsPage(user.uid, { pageSize: NOTIFICATIONS_PAGE_SIZE });
-  const initialNotifications = page.notifications.map((notification) => ({
-    ...notification,
-    createdAt: notification.createdAt.toDate().toISOString(),
-  }));
+  const initialNotifications = page.notifications.map(toClientNotification);
 
   return (
     <div className="space-y-6">

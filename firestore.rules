@@ -78,6 +78,19 @@ service cloud.firestore {
       allow update, delete: if isTeamAdmin(resource.data.teamId);
     }
 
+    // Fan-facing parallel to teamAdminInvites above — same shape, but
+    // accepting calls followTeam (see src/lib/teams/follow-invite-repository.ts)
+    // instead of granting admin rights. Same rationale for Server-Action-only
+    // accept/decline.
+    match /teamFollowInvites/{inviteId} {
+      allow read: if isSignedIn() && (
+        isTeamAdmin(resource.data.teamId) ||
+        resource.data.invitedEmail == request.auth.token.email
+      );
+      allow create: if isTeamAdmin(request.resource.data.teamId);
+      allow update, delete: if isTeamAdmin(resource.data.teamId);
+    }
+
     // Note: like teams/players/invites above, Season/Action mutations all go
     // through Server Actions using firebase-admin (bypasses these rules) —
     // see src/lib/seasons/, src/lib/actions/. These rules are defense-in-depth
@@ -122,6 +135,7 @@ service cloud.firestore {
     match /media/{mediaId} {
       allow read: if true;
       allow create: if isTeamAdmin(request.resource.data.teamId);
+      allow update: if isTeamAdmin(resource.data.teamId);
       allow delete: if isTeamAdmin(resource.data.teamId);
     }
 

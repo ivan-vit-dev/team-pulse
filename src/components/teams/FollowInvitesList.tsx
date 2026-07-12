@@ -5,31 +5,32 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { acceptInviteAction, declineInviteAction } from "@/app/[locale]/(app)/invites/actions";
+import {
+  acceptFollowInviteAction,
+  declineFollowInviteAction,
+} from "@/app/[locale]/(app)/invites/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { AdminInvite } from "@/lib/types/team";
+import type { FollowInvite } from "@/lib/types/team";
 
 // Server Components can't pass Firestore Timestamp instances to Client
 // Components — the caller strips createdAt/updatedAt before passing down.
-export interface InviteWithTeamName extends Omit<AdminInvite, "createdAt" | "updatedAt"> {
+export interface FollowInviteWithTeamName extends Omit<FollowInvite, "createdAt" | "updatedAt"> {
   teamName: string;
 }
 
-export function InvitesList({ invites }: { invites: InviteWithTeamName[] }) {
+export function FollowInvitesList({ invites }: { invites: FollowInviteWithTeamName[] }) {
   const t = useTranslations("invites");
   const ta = useTranslations("auth");
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  // Empty state is handled once, centrally, by the /invites page (which
-  // renders both this list and FollowInvitesList) — not per-list here.
   if (invites.length === 0) return null;
 
   async function handleAccept(inviteId: string) {
     setBusyId(inviteId);
     try {
-      await acceptInviteAction(inviteId);
+      await acceptFollowInviteAction(inviteId);
       toast.success(t("accepted"));
       router.refresh();
     } catch {
@@ -42,7 +43,7 @@ export function InvitesList({ invites }: { invites: InviteWithTeamName[] }) {
   async function handleDecline(inviteId: string) {
     setBusyId(inviteId);
     try {
-      await declineInviteAction(inviteId);
+      await declineFollowInviteAction(inviteId);
       toast.success(t("declined"));
       router.refresh();
     } catch {
@@ -57,7 +58,7 @@ export function InvitesList({ invites }: { invites: InviteWithTeamName[] }) {
       {invites.map((invite) => (
         <Card key={invite.id}>
           <CardContent className="flex items-center justify-between gap-3 pt-6">
-            <p className="text-sm">{t("invitedTo", { team: invite.teamName })}</p>
+            <p className="text-sm">{t("invitedToFollow", { team: invite.teamName })}</p>
             <div className="flex gap-2">
               <Button
                 size="sm"

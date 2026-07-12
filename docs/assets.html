@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeamPulse — Visual Assets Brief</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        oklch(0.10 0.018 250);
+      --surface:   oklch(0.16 0.02 250);
+      --surface2:  oklch(0.22 0.014 250);
+      --border:    oklch(1 0 0 / 12%);
+      --primary:   oklch(0.72 0.19 250);
+      --primary-deep: oklch(0.56 0.17 250);
+      --teal:      oklch(0.60 0.18 195);
+      --floodlight: oklch(0.78 0.16 78);
+      --text:      oklch(0.95 0.004 250);
+      --muted:     oklch(0.64 0.016 250);
+      --dim:       oklch(0.50 0.014 250);
+      --red:       oklch(0.68 0.19 25);
+      --orange:    oklch(0.75 0.15 55);
+      --sidebar-w: 240px;
+      --radius:    10px;
+    }
+
+    body {
+      font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed; top: 0; left: 0;
+      height: 100vh; overflow-y: auto;
+      padding: 0 0 32px;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .sidebar-logo { padding: 18px 16px 14px; border-bottom: 1px solid var(--border); }
+    .sidebar-logo strong { color: var(--teal); font-size: .9rem; display: block; }
+    .sidebar-logo small { color: var(--dim); font-size: .7rem; }
+    .nav-group { padding: 12px 0 4px; }
+    .nav-group-label {
+      padding: 0 16px 5px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim);
+    }
+    .nav-link {
+      display: block; padding: 5px 16px;
+      font-size: .8rem; color: var(--muted);
+      text-decoration: none; transition: color .15s, background .15s;
+    }
+    .nav-link:hover { color: var(--text); background: var(--surface2); }
+    .nav-link.active { color: var(--teal); background: color-mix(in oklch, var(--teal) 12%, transparent); }
+
+    /* ── Main ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; padding: 0 0 80px; }
+
+    .page-header {
+      background:
+        radial-gradient(70% 130% at 85% 0%, color-mix(in oklch, var(--floodlight) 10%, transparent), transparent 60%),
+        radial-gradient(70% 130% at 15% 20%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 60%),
+        var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 40px 48px 32px;
+    }
+    .page-header .label {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 8px;
+    }
+    .page-header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.5px; }
+    .page-header p { color: var(--muted); margin-top: 8px; max-width: 640px; font-size: .9rem; }
+
+    .section { padding: 36px 48px; border-bottom: 1px solid var(--border); }
+    .section:last-of-type { border-bottom: none; }
+    .section > h2 {
+      font-size: 1.25rem; font-weight: 700; letter-spacing: -.3px;
+      padding-bottom: 10px; border-bottom: 1px solid var(--border);
+      margin-bottom: 6px;
+    }
+    .section > .desc { color: var(--muted); font-size: .85rem; margin-bottom: 20px; margin-top: 6px; }
+
+    h3 { font-size: .95rem; font-weight: 700; color: var(--teal); margin: 22px 0 8px; }
+    h3:first-child { margin-top: 0; }
+    p { font-size: .85rem; color: var(--muted); margin: 5px 0; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 999px;
+      font-size: 10px; font-weight: 700; letter-spacing: .5px;
+      text-transform: uppercase; white-space: nowrap;
+    }
+    .p1 { background: color-mix(in oklch, var(--red) 15%, transparent); color: var(--red); border: 1px solid var(--red); }
+    .p2 { background: color-mix(in oklch, var(--orange) 15%, transparent); color: var(--orange); border: 1px solid var(--orange); }
+    .p3 { background: color-mix(in oklch, var(--floodlight) 15%, transparent); color: var(--floodlight); border: 1px solid var(--floodlight); }
+    .p4 { background: color-mix(in oklch, var(--dim) 15%, transparent); color: var(--muted); border: 1px solid var(--dim); }
+
+    .asset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin: 14px 0; }
+    .asset-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .asset-card-preview {
+      height: 100px;
+      display: flex; align-items: center; justify-content: center;
+      border-bottom: 1px solid var(--border);
+      font-size: 2rem;
+      position: relative; overflow: hidden;
+    }
+    .asset-card-body { padding: 12px 14px; }
+    .asset-card-name { font-weight: 700; font-size: .88rem; margin-bottom: 2px; }
+    .asset-card-file { font-family: monospace; font-size: .75rem; color: var(--floodlight); margin-bottom: 6px; }
+    .asset-card-meta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 6px; }
+    .spec { background: var(--surface2); border-radius: 4px; padding: 2px 6px; font-size: 11px; color: var(--muted); font-family: monospace; }
+
+    .dark-preview { background: var(--bg); }
+    .icon-preview { background: var(--surface2); }
+    .hero-preview {
+      background:
+        radial-gradient(80% 120% at 80% 0%, color-mix(in oklch, var(--floodlight) 14%, transparent), transparent 60%),
+        radial-gradient(80% 120% at 20% 20%, color-mix(in oklch, var(--primary) 18%, transparent), transparent 60%),
+        var(--bg);
+    }
+    .og-preview {
+      background:
+        radial-gradient(90% 140% at 100% 0%, color-mix(in oklch, var(--primary) 16%, transparent), transparent 60%),
+        var(--bg);
+    }
+
+    .logo-mark {
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-deep), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+    }
+
+    .color-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .color-chip {
+      border-radius: 8px; padding: 10px 14px;
+      font-size: .72rem; font-weight: 600; font-family: monospace;
+      border: 1px solid oklch(1 0 0 / 15%);
+      min-width: 118px;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--surface2); font-size: .83rem; vertical-align: top; }
+    thead th { background: var(--surface2); color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    tbody tr:hover { background: var(--surface); }
+    td:first-child { white-space: nowrap; }
+    code { font-family: monospace; font-size: .77rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; color: var(--floodlight); }
+
+    ul, ol { padding-left: 18px; color: var(--muted); font-size: .85rem; }
+    li { margin: 4px 0; }
+    li strong { color: var(--text); }
+
+    .note {
+      background: color-mix(in oklch, var(--teal) 8%, transparent);
+      border: 1px solid color-mix(in oklch, var(--teal) 40%, transparent);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: .83rem;
+      color: var(--muted);
+      margin: 12px 0;
+    }
+    .note strong { color: var(--teal); }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .section, .page-header { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ─── SIDEBAR ─── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <strong>TeamPulse</strong>
+    <small>Visual Assets Brief</small>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Brand</div>
+    <a class="nav-link" href="#brand">Logo &amp; Identity</a>
+    <a class="nav-link" href="#colors">Color Palette</a>
+    <a class="nav-link" href="#typography">Typography Spec</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">System Icons</div>
+    <a class="nav-link" href="#favicon">Favicon Pack</a>
+    <a class="nav-link" href="#push">Push Notification Icons</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">UI Assets</div>
+    <a class="nav-link" href="#empty-states">Empty State Illustrations</a>
+    <a class="nav-link" href="#placeholders">Placeholders</a>
+    <a class="nav-link" href="#og">Social / OG Images</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Marketing</div>
+    <a class="nav-link" href="#landing">Landing Page Images</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Reference</div>
+    <a class="nav-link" href="#checklist">Master Checklist</a>
+    <a class="nav-link" href="#export">Export Guidelines</a>
+  </div>
+</nav>
+
+<!-- ─── MAIN ─── -->
+<main class="main">
+
+<div class="page-header">
+  <div class="label">Design Brief</div>
+  <h1>Visual Assets Specification</h1>
+  <p>Every image, icon, illustration, and background asset TeamPulse needs — with exact dimensions,
+     color specs, file formats, and priority ratings. Current state: <code>public/</code> contains
+     only Next.js starter SVGs, so everything below is to-be-created.</p>
+  <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+    <span class="badge p1">🔴 P1 — Launch blocker</span>
+    <span class="badge p2">🟠 P2 — Required before users see it</span>
+    <span class="badge p3">🟡 P3 — Nice to have at launch</span>
+    <span class="badge p4">⚪ P4 — Post-launch polish</span>
+  </div>
+</div>
+
+<!-- ────────────── BRAND ────────────── -->
+<div class="section" id="brand">
+  <h2>Logo &amp; Brand Identity</h2>
+  <p class="desc">The in-app "logo" today is the word TeamPulse in gradient text
+     (<code>.gradient-text</code>, navy → teal). The logo system below formalizes that into real
+     files. All versions from a single master Figma/Illustrator source; export SVG + PNG from the
+     same file.</p>
+
+  <div class="asset-grid">
+    <div class="asset-card">
+      <div class="asset-card-preview dark-preview" style="gap:10px">
+        <div class="logo-mark" style="width:36px;height:36px;font-size:18px">⚽</div>
+        <div style="font-weight:800;font-size:16px">
+          <span style="background:linear-gradient(135deg,var(--primary),var(--teal));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">Team</span><span>Pulse</span>
+        </div>
+      </div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Logo — Horizontal</div>
+        <div class="asset-card-file">public/logo-horizontal.svg / .png</div>
+        <p>Mark + wordmark. Primary lockup for the Navbar, emails, docs headers. Replaces the
+           current pure-CSS gradient text.</p>
+        <div class="asset-card-meta">
+          <span class="spec">SVG primary</span><span class="spec">PNG @1x @2x</span>
+          <span class="badge p1">P1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview dark-preview">
+        <div class="logo-mark" style="width:64px;height:64px;font-size:32px">⚽</div>
+      </div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">App Icon / Mark</div>
+        <div class="asset-card-file">public/logo-mark.svg</div>
+        <p>Icon only — no text. Source for favicons and the push-notification icon. Must stay
+           legible at 16px.</p>
+        <div class="asset-card-meta">
+          <span class="spec">SVG primary</span><span class="spec">Legible @ 16px</span>
+          <span class="badge p1">P1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview" style="background:oklch(0.975 0.006 95)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="logo-mark" style="width:32px;height:32px;font-size:16px">⚽</div>
+          <div style="font-weight:800;font-size:13px;color:oklch(0.16 0.02 250)">TeamPulse</div>
+        </div>
+      </div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Logo — Light Background</div>
+        <div class="asset-card-file">public/logo-light.svg</div>
+        <p>Light-mode variant — the app ships both themes, so this is NOT optional polish here.
+           Wordmark in near-black navy <code>oklch(0.16 0.02 250)</code>.</p>
+        <div class="asset-card-meta">
+          <span class="spec">SVG primary</span>
+          <span class="badge p2">P2</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview dark-preview">
+        <div style="font-weight:900;font-size:22px;background:linear-gradient(135deg,var(--primary),var(--teal));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">TP</div>
+      </div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Monogram + Monochrome</div>
+        <div class="asset-card-file">public/logo-monogram.svg · logo-mono-{white,black}.svg</div>
+        <p>"TP" lettermark for tiny contexts; solid single-color versions for print/embroidery.</p>
+        <div class="asset-card-meta">
+          <span class="spec">SVG only</span>
+          <span class="badge p4">P4</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>Logo concept direction:</strong> a football with a <strong>pulse/heartbeat line</strong>
+    running through it — the "pulse" of a team's season. Rendered in the navy→teal gradient with an
+    optional floodlight-gold spark at the pulse peak. Flat, bold, geometric — no photographic
+    imagery, no stadium clichés. It must not resemble any real club crest (teams upload their own
+    crests next to it). Wordmark in <strong>Roboto Condensed Bold</strong> to match the in-app
+    <code>font-impact</code> display face.
+  </div>
+</div>
+
+<!-- ────────────── COLORS ────────────── -->
+<div class="section" id="colors">
+  <h2>Definitive Color Palette</h2>
+  <p class="desc">"Matchday, under lights." All tokens are <code>oklch()</code> — full definitions
+     in <code>APP_DESIGN.md</code> / <code>src/app/globals.css</code>. Assets must work in BOTH
+     light and dark themes. The floodlight gold is reserved for glow/highlight moments — it is not
+     a general accent.</p>
+
+  <h3>Brand Core</h3>
+  <div class="color-row">
+    <div class="color-chip" style="background:oklch(0.56 0.17 250);color:white">Navy (light)<br>oklch(0.56 0.17 250)</div>
+    <div class="color-chip" style="background:oklch(0.72 0.19 250);color:oklch(0.1 0.02 250)">Navy (dark)<br>oklch(0.72 0.19 250)</div>
+    <div class="color-chip" style="background:oklch(0.42 0.15 195);color:white">Teal (light)<br>oklch(0.42 0.15 195)</div>
+    <div class="color-chip" style="background:oklch(0.60 0.18 195);color:oklch(0.1 0.02 250)">Teal (dark)<br>oklch(0.60 0.18 195)</div>
+    <div class="color-chip" style="background:oklch(0.74 0.15 75);color:oklch(0.24 0.05 75)">Floodlight (light)<br>oklch(0.74 0.15 75)</div>
+    <div class="color-chip" style="background:oklch(0.78 0.16 78);color:oklch(0.16 0.03 78)">Floodlight (dark)<br>oklch(0.78 0.16 78)</div>
+  </div>
+
+  <h3>App Backgrounds</h3>
+  <div class="color-row">
+    <div class="color-chip" style="background:oklch(0.975 0.006 95);color:oklch(0.16 0.02 250)">BG Light — chalk<br>oklch(0.975 0.006 95)</div>
+    <div class="color-chip" style="background:oklch(0.10 0.018 250);color:oklch(0.64 0.016 250);border-color:oklch(1 0 0 / 20%)">BG Dark — ink<br>oklch(0.10 0.018 250)</div>
+    <div class="color-chip" style="background:oklch(0.16 0.02 250);color:oklch(0.64 0.016 250)">Card (dark)<br>oklch(0.16 0.02 250)</div>
+    <div class="color-chip" style="background:oklch(0.22 0.014 250);color:oklch(0.64 0.016 250)">Surface 2 (dark)<br>oklch(0.22 0.014 250)</div>
+  </div>
+
+  <h3>Action-Type Colors (timeline markers, badges)</h3>
+  <div class="color-row">
+    <div class="color-chip" style="background:oklch(0.60 0.19 25);color:white">Match<br>hue 25</div>
+    <div class="color-chip" style="background:oklch(0.58 0.14 230);color:white">Training<br>hue 230</div>
+    <div class="color-chip" style="background:oklch(0.70 0.14 85);color:oklch(0.2 0.05 85)">Tournament<br>hue 85</div>
+    <div class="color-chip" style="background:oklch(0.55 0.20 300);color:white">Cup<br>hue 300</div>
+    <div class="color-chip" style="background:oklch(0.65 0.01 250);color:white">Other<br>neutral</div>
+  </div>
+  <p>Each has a <code>-foreground</code> variant tuned to clear WCAG AA when used as text over its
+     own ~18% tint — see the token table in APP_DESIGN.md. Use the base tone for solid markers
+     only, never for text.</p>
+
+  <h3>Brand Gradient</h3>
+  <div style="height:48px;border-radius:10px;background:linear-gradient(135deg,oklch(0.56 0.17 250) 0%,oklch(0.42 0.15 195) 100%);margin:10px 0"></div>
+  <p><code>135deg, navy → teal</code> — CTAs, logo, gradient text. Never introduce violet
+     (hue ~285) — that belongs to a sibling project; and don't repurpose the floodlight gold as a
+     warning/amber semantic color.</p>
+
+  <div class="note">
+    <strong>Team-brand override:</strong> teams carry their own colors, applied only inside
+    team-scoped surfaces via <code>--team-primary/--team-secondary</code>. Brand assets must never
+    hardcode any specific team's colors, and the app chrome always stays navy/teal.
+  </div>
+</div>
+
+<!-- ────────────── TYPOGRAPHY ────────────── -->
+<div class="section" id="typography">
+  <h2>Typography Reference</h2>
+  <p class="desc">For any asset that includes text. Match the in-app fonts exactly — all free on
+     Google Fonts, loaded via <code>next/font/google</code>.</p>
+  <table>
+    <thead><tr><th>Role</th><th>Font</th><th>Weight</th><th>Use in assets</th></tr></thead>
+    <tbody>
+      <tr><td>Wordmark / hero headlines</td><td>Roboto Condensed</td><td>700 Bold (<code>font-impact</code>)</td><td>Logo wordmark, scorelines, big stat numbers</td></tr>
+      <tr><td>Display / headings</td><td>Roboto</td><td>700 Bold (<code>font-display</code>)</td><td>Card titles, section heads in marketing images</td></tr>
+      <tr><td>Body / UI text</td><td>Roboto</td><td>400–500 (<code>font-sans</code>)</td><td>Descriptions, labels, OG taglines</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:10px"><code>font-impact</code> is used sparingly in-app (scorelines, hero
+     numbers) — keep the same restraint in assets.</p>
+</div>
+
+<!-- ────────────── FAVICON ────────────── -->
+<div class="section" id="favicon">
+  <h2>Favicon Pack</h2>
+  <p class="desc">Files go into <code>public/</code>; reference them from the metadata object in
+     <code>src/app/[locale]/layout.tsx</code>. Generate the whole pack from the 512×512 master
+     logo mark with RealFaviconGenerator or Favicon.io.</p>
+
+  <table>
+    <thead><tr><th>File</th><th>Size</th><th>Format</th><th>Purpose</th><th>Priority</th></tr></thead>
+    <tbody>
+      <tr><td><code>public/favicon.ico</code></td><td>16×16 + 32×32</td><td>ICO (multi-size)</td><td>Browser-tab fallback for all browsers</td><td><span class="badge p1">P1</span></td></tr>
+      <tr><td><code>public/favicon.svg</code></td><td>Scalable</td><td>SVG</td><td>Modern browsers — crisp at any size, theme-adaptive</td><td><span class="badge p1">P1</span></td></tr>
+      <tr><td><code>public/favicon-16x16.png</code> · <code>favicon-32x32.png</code></td><td>16 / 32</td><td>PNG</td><td>Small tab + bookmarks</td><td><span class="badge p1">P1</span></td></tr>
+      <tr><td><code>public/apple-touch-icon.png</code></td><td>180×180</td><td>PNG, no transparency</td><td>iOS "Add to Home Screen" — navy ink or gradient background, iOS rounds the corners itself</td><td><span class="badge p1">P1</span></td></tr>
+      <tr><td><code>public/safari-pinned-tab.svg</code></td><td>Scalable</td><td>SVG monochrome</td><td>Safari pinned tab — pure black paths on transparent</td><td><span class="badge p3">P3</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>favicon.svg tip:</strong> the app supports light and dark themes, so make the SVG
+    adapt: <code>@media (prefers-color-scheme: dark) { .mark { fill: oklch(0.72 0.19 250); } }</code>
+    — brighter navy on dark OS themes, deep navy on light.
+  </div>
+
+  <div class="note">
+    <strong>PWA note:</strong> TeamPulse is currently <em>not</em> configured as an installable PWA
+    (no <code>manifest.json</code>; <code>public/firebase-messaging-sw.js</code> exists only for
+    FCM background push). If a manifest is added later, budget a maskable icon set (192 + 512,
+    logo within the center 80% safe zone) — parked at P4 in the checklist.
+  </div>
+</div>
+
+<!-- ────────────── PUSH ICONS ────────────── -->
+<div class="section" id="push">
+  <h2>Push Notification Icons</h2>
+  <p class="desc">FCM web push is live (five triggers). Notifications currently render without a
+     brand icon — these two files fix that, referenced from the notification payload /
+     <code>public/firebase-messaging-sw.js</code>.</p>
+
+  <table>
+    <thead><tr><th>File</th><th>Size</th><th>Purpose</th><th>Priority</th></tr></thead>
+    <tbody>
+      <tr><td><code>public/icons/notification-icon.png</code></td><td>192×192</td><td>Large icon shown in the notification body. Logo mark on navy or gradient background, PNG-24.</td><td><span class="badge p2">P2</span></td></tr>
+      <tr><td><code>public/icons/notification-badge.png</code></td><td>96×96</td><td>Android status-bar badge — <strong>monochrome white on transparent</strong>, simple silhouette of the mark (Android tints it).</td><td><span class="badge p3">P3</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ────────────── EMPTY STATES ────────────── -->
+<div class="section" id="empty-states">
+  <h2>Empty State Illustrations</h2>
+  <p class="desc">Every empty state today is a plain <code>text-muted-foreground</code> sentence.
+     These SVG illustrations upgrade the highest-traffic ones. Style: minimal, geometric,
+     football-themed, using the app palette. Display size ≈ 280×200px.</p>
+
+  <div class="asset-grid">
+    <div class="asset-card">
+      <div class="asset-card-preview icon-preview">📜</div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">No Actions Yet</div>
+        <div class="asset-card-file">public/illustrations/empty-timeline.svg</div>
+        <p>Shown on the public team page and admin dashboard when a season has no actions — the
+           app's most-seen empty state. An empty vertical timeline with a floodlight glow where
+           the "next" card will appear.</p>
+        <div class="asset-card-meta"><span class="spec">SVG</span><span class="spec">280×200</span><span class="badge p2">P2</span></div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview icon-preview">➕</div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Not Following Any Teams</div>
+        <div class="asset-card-file">public/illustrations/empty-feed.svg</div>
+        <p>Signed-in home before the user follows a team. A pulse line searching for a team crest —
+           "find your team" energy. Pairs with an explore/search CTA.</p>
+        <div class="asset-card-meta"><span class="spec">SVG</span><span class="spec">280×200</span><span class="badge p2">P2</span></div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview icon-preview">🛡️</div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">No Teams / No Seasons</div>
+        <div class="asset-card-file">public/illustrations/empty-teams.svg · empty-seasons.svg</div>
+        <p>"My teams" when the user admins nothing, and the dashboard before the first season.
+           Empty crest outline; calendar with a football.</p>
+        <div class="asset-card-meta"><span class="spec">SVG</span><span class="spec">280×200</span><span class="badge p3">P3</span></div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview icon-preview">📸</div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">No Media / No Notifications / No Reports</div>
+        <div class="asset-card-file">public/illustrations/empty-{media,notifications,reports}.svg</div>
+        <p>Action-detail gallery, notification inbox, and the moderation queue ("no pending
+           reports" is a <em>good</em> state — give it a calm, positive tone).</p>
+        <div class="asset-card-meta"><span class="spec">SVG</span><span class="spec">280×200</span><span class="badge p3">P3</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>Illustration style guide:</strong> minimal geometric shapes, max 4–5 colors from the
+    app palette. Solid fills only — no gradients inside SVG paths. Must read on BOTH themes: use
+    <code>currentColor</code> for strokes so the illustration inherits
+    <code>text-muted-foreground</code>, with navy/teal/floodlight accents that hold up on chalk
+    and ink backgrounds alike.
+  </div>
+</div>
+
+<!-- ────────────── PLACEHOLDERS ────────────── -->
+<div class="section" id="placeholders">
+  <h2>Content Placeholders</h2>
+  <p class="desc">Today every avatar/logo fallback is two initials in an <code>AvatarFallback</code>.
+     Purpose-drawn placeholders are warmer — and for youth players they are the <em>permanent</em>
+     visual, not a temporary one.</p>
+
+  <div class="asset-grid">
+    <div class="asset-card">
+      <div class="asset-card-preview icon-preview">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,oklch(0.22 0.014 250),oklch(0.3 0.02 250));border:2px solid oklch(0.5 0.014 250);display:flex;align-items:center;justify-content:center;font-size:32px">🔒</div>
+      </div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Youth Player Avatar</div>
+        <div class="asset-card-file">public/placeholders/player-youth.svg</div>
+        <p><strong>The most important placeholder in the app.</strong> Youth players can never have
+           a photo (<code>avatarURL</code> is forced null server-side), so this IS their public
+           face. Neutral abstract player silhouette — no face, no age or gender markers, nothing
+           photo-like. Pairs with <code>YouthPrivacyBadge</code>.</p>
+        <div class="asset-card-meta"><span class="spec">SVG</span><span class="spec">Square, circle-safe</span><span class="badge p1">P1</span></div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview icon-preview">
+        <div style="width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,oklch(0.22 0.014 250),oklch(0.3 0.02 250));border:2px solid oklch(0.5 0.014 250);display:flex;align-items:center;justify-content:center;font-size:32px">🛡️</div>
+      </div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Team Logo Placeholder</div>
+        <div class="asset-card-file">public/placeholders/team-logo.svg</div>
+        <p>Generic crest shape for teams with no <code>logoURL</code>. Must not resemble any real
+           club's crest. Used on team pages, feed cards, followed-teams list.</p>
+        <div class="asset-card-meta"><span class="spec">SVG</span><span class="spec">Square</span><span class="badge p2">P2</span></div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview icon-preview">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,oklch(0.22 0.014 250),oklch(0.3 0.02 250));border:2px solid oklch(0.5 0.014 250);display:flex;align-items:center;justify-content:center;font-size:32px">👤</div>
+      </div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">User / Adult Player Avatar</div>
+        <div class="asset-card-file">public/placeholders/avatar.svg</div>
+        <p>Fallback for fans and adult players without an uploaded photo — Navbar menu, comment
+           rows, admin lists. Distinct from (but visually related to) the youth placeholder.</p>
+        <div class="asset-card-meta"><span class="spec">SVG</span><span class="spec">Circle-safe</span><span class="badge p3">P3</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ────────────── OG IMAGES ────────────── -->
+<div class="section" id="og">
+  <h2>Social &amp; Open Graph Images</h2>
+  <p class="desc">Shown when TeamPulse URLs are shared — and sharing is a core loop here: the
+     admin dashboard has a "share follow link" button pointing at the public team page. A missing
+     OG image undermines exactly that flow.</p>
+
+  <div class="asset-grid">
+    <div class="asset-card">
+      <div class="asset-card-preview og-preview" style="flex-direction:column;gap:4px">
+        <div style="font-size:11px;font-weight:800;letter-spacing:2px"><span style="color:oklch(0.72 0.19 250)">TEAM</span><span style="color:oklch(0.6 0.18 195)">PULSE</span></div>
+        <div style="font-size:8px;color:oklch(0.64 0.016 250)">Follow your team's season</div>
+      </div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Main OG Image</div>
+        <div class="asset-card-file">public/og-image.png</div>
+        <p>Default social preview for the landing page and any page without a specific image.
+           Logo + tagline + a stylized timeline card on the ink background with floodlight glow.
+           <strong>Most important marketing asset.</strong></p>
+        <div class="asset-card-meta"><span class="spec">PNG</span><span class="spec">1200×630</span><span class="badge p1">P1</span></div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview og-preview">🛡️</div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Team Page OG (fallback)</div>
+        <div class="asset-card-file">public/og-team-fallback.png</div>
+        <p>Static fallback for public team pages — the share-follow-link target. Ideally superseded
+           later by dynamic per-team OG images (team name + colors via <code>next/og</code>), but
+           ship the static one first.</p>
+        <div class="asset-card-meta"><span class="spec">PNG</span><span class="spec">1200×630</span><span class="badge p2">P2</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>Composition guide:</strong> ink-navy background, logo top-left, tagline in Roboto,
+    one stylized action card angled right with the floodlight "next" ring. All text inside the
+    center 80% safe zone, readable at 300×158 thumbnail size. Czech + English variants are
+    unnecessary — keep the tagline short and bilingual-safe or English-only.
+  </div>
+</div>
+
+<!-- ────────────── LANDING ────────────── -->
+<div class="section" id="landing">
+  <h2>Landing Page Images</h2>
+  <p class="desc">The hero is deliberately CSS-only today (<code>.gradient-hero</code> +
+     <code>.bg-pitch-lines</code> + <code>.bg-grain</code>) — no image file required, and it should
+     stay that way. Optional additions below sell the product to a parent or club volunteer.</p>
+
+  <div class="asset-grid">
+    <div class="asset-card">
+      <div class="asset-card-preview hero-preview">📜</div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Feature — Season Timeline</div>
+        <div class="asset-card-file">public/marketing/feature-timeline.png</div>
+        <p>Stylized timeline mock: floodlit "next match" card, ticket-stub past results, reaction
+           emoji. Rendered artwork, not a raw screenshot — but faithful to the real UI.</p>
+        <div class="asset-card-meta"><span class="spec">PNG</span><span class="spec">800×600 @2x</span><span class="badge p3">P3</span></div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview hero-preview">🔒</div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Feature — Youth Privacy</div>
+        <div class="asset-card-file">public/marketing/feature-privacy.png</div>
+        <p>The differentiator for parents: pseudonym-only roster with the privacy badge, a shield
+           motif. Reassuring, not scary.</p>
+        <div class="asset-card-meta"><span class="spec">PNG</span><span class="spec">800×600 @2x</span><span class="badge p3">P3</span></div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview hero-preview">🔔</div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Feature — Notifications</div>
+        <div class="asset-card-file">public/marketing/feature-notifications.png</div>
+        <p>Phone with a match push notification + the in-app inbox. "Never miss a kickoff."</p>
+        <div class="asset-card-meta"><span class="spec">PNG</span><span class="spec">800×600 @2x</span><span class="badge p3">P3</span></div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <div class="asset-card-preview hero-preview" style="opacity:.7">🏟️</div>
+      <div class="asset-card-body">
+        <div class="asset-card-name">Hero Background Texture</div>
+        <div class="asset-card-file">public/marketing/hero-bg-texture.png</div>
+        <p>Optional low-opacity stadium-lights bokeh layered under the existing CSS gradient
+           (8–12% opacity, large screens only). 1920×1080 minimum.</p>
+        <div class="asset-card-meta"><span class="spec">PNG</span><span class="spec">1920×1080</span><span class="badge p4">P4</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ────────────── MASTER CHECKLIST ────────────── -->
+<div class="section" id="checklist">
+  <h2>Master Checklist</h2>
+  <p class="desc">All assets in priority order — the handoff checklist for a designer.</p>
+
+  <h3>🔴 P1 — Must exist before launch</h3>
+  <table>
+    <thead><tr><th>Asset</th><th>File path</th><th>Format</th><th>Size</th></tr></thead>
+    <tbody>
+      <tr><td>App icon / mark</td><td><code>public/logo-mark.svg</code></td><td>SVG</td><td>—</td></tr>
+      <tr><td>Logo horizontal</td><td><code>public/logo-horizontal.svg</code></td><td>SVG + PNG</td><td>—</td></tr>
+      <tr><td>Favicon .ico</td><td><code>public/favicon.ico</code></td><td>ICO</td><td>16 + 32</td></tr>
+      <tr><td>Favicon SVG (theme-adaptive)</td><td><code>public/favicon.svg</code></td><td>SVG</td><td>—</td></tr>
+      <tr><td>Favicon PNGs</td><td><code>public/favicon-{16x16,32x32}.png</code></td><td>PNG</td><td>16 / 32</td></tr>
+      <tr><td>Apple touch icon</td><td><code>public/apple-touch-icon.png</code></td><td>PNG</td><td>180×180</td></tr>
+      <tr><td>Youth player avatar placeholder</td><td><code>public/placeholders/player-youth.svg</code></td><td>SVG</td><td>square</td></tr>
+      <tr><td>Main OG image</td><td><code>public/og-image.png</code></td><td>PNG</td><td>1200×630</td></tr>
+    </tbody>
+  </table>
+
+  <h3>🟠 P2 — Required before users see those features</h3>
+  <table>
+    <thead><tr><th>Asset</th><th>File path</th></tr></thead>
+    <tbody>
+      <tr><td>Logo — light background variant</td><td><code>public/logo-light.svg</code></td></tr>
+      <tr><td>Team logo placeholder</td><td><code>public/placeholders/team-logo.svg</code></td></tr>
+      <tr><td>Push notification icon</td><td><code>public/icons/notification-icon.png</code></td></tr>
+      <tr><td>Empty timeline illustration</td><td><code>public/illustrations/empty-timeline.svg</code></td></tr>
+      <tr><td>Empty feed (no follows) illustration</td><td><code>public/illustrations/empty-feed.svg</code></td></tr>
+      <tr><td>Team page OG fallback</td><td><code>public/og-team-fallback.png</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>🟡 P3 — Nice to have at launch</h3>
+  <table>
+    <thead><tr><th>Asset</th><th>File path</th></tr></thead>
+    <tbody>
+      <tr><td>User avatar placeholder</td><td><code>public/placeholders/avatar.svg</code></td></tr>
+      <tr><td>Remaining empty states (teams, seasons, media, notifications, reports)</td><td><code>public/illustrations/empty-*.svg</code></td></tr>
+      <tr><td>Push notification badge (monochrome)</td><td><code>public/icons/notification-badge.png</code></td></tr>
+      <tr><td>Safari pinned tab</td><td><code>public/safari-pinned-tab.svg</code></td></tr>
+      <tr><td>Landing feature images (timeline, privacy, notifications)</td><td><code>public/marketing/feature-*.png</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>⚪ P4 — Post-launch polish</h3>
+  <table>
+    <thead><tr><th>Asset</th><th>File path</th></tr></thead>
+    <tbody>
+      <tr><td>Monogram + monochrome logo variants</td><td><code>public/logo-monogram.svg</code> · <code>logo-mono-*.svg</code></td></tr>
+      <tr><td>Hero background texture</td><td><code>public/marketing/hero-bg-texture.png</code></td></tr>
+      <tr><td>PWA manifest icon set (if PWA is ever enabled)</td><td><code>public/icons/icon-{192,512}.png</code> maskable</td></tr>
+      <tr><td>Dynamic per-team OG images (next/og)</td><td>generated at request time</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ────────────── EXPORT GUIDELINES ────────────── -->
+<div class="section" id="export">
+  <h2>Export Guidelines</h2>
+
+  <div class="two-col">
+    <div>
+      <h3>SVG requirements</h3>
+      <ul>
+        <li>Flatten all text to paths — no font embedding</li>
+        <li>Optimize with SVGO; <code>viewBox</code>, not fixed width/height</li>
+        <li>Illustrations ≤ 8 kB, icons ≤ 2 kB after optimization</li>
+        <li><strong>Both themes:</strong> use <code>currentColor</code> for strokes/neutral fills —
+            the app ships light AND dark, and every asset renders on both</li>
+        <li>Accent colors: hardcode the oklch brand values (they're theme-stable enough), or ship
+            <code>-light</code>/<code>-dark</code> pairs where they aren't</li>
+      </ul>
+    </div>
+    <div>
+      <h3>PNG requirements</h3>
+      <ul>
+        <li>Export at <strong>@2x</strong> minimum for marketing images</li>
+        <li>Compress with TinyPNG/Squoosh — marketing &lt; 200 kB, OG &lt; 300 kB</li>
+        <li>Apple touch icon: PNG-24, no transparency</li>
+        <li>Push badge: pure white on transparent (Android tints it)</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Delivery format</h3>
+      <ul>
+        <li>Figma file with all assets on labeled frames</li>
+        <li>Zip export: <code>/svg/</code>, <code>/png/</code>, <code>/ico/</code> folders</li>
+        <li>File naming: lowercase, hyphens, no spaces</li>
+        <li>Everything lands in <code>public/</code> per the paths above</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Testing checklist</h3>
+      <ul>
+        <li>Favicons in Chrome, Firefox, Safari, Edge — light and dark OS themes</li>
+        <li>OG images via opengraph.xyz or Meta's sharing debugger</li>
+        <li>Push icon: trigger a real FCM push from the emulator suite</li>
+        <li>Placeholders: create a youth player and a logo-less team, verify fallbacks</li>
+        <li>Empty states: fresh account walkthrough (no follows → no teams → new season)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:20px">
+    <strong>Total estimated design effort:</strong> P1 (~half a day: logo + favicon pack via a
+    generator + youth placeholder + OG image). P2 (~1 day: light variant, placeholders, two
+    illustrations, push icon). P3 (~1–2 days). The logo, the youth-safe placeholder, and the OG
+    image are the true blockers — everything else can ship as a second pass.
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('[id]');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

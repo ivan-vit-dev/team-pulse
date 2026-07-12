@@ -1,7 +1,8 @@
 import { ActionTypeBadge } from "@/components/actions/ActionTypeBadge";
-import { LikeButton } from "@/components/timeline/LikeButton";
+import { ReactionPicker } from "@/components/timeline/ReactionPicker";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "@/i18n/navigation";
+import { getReactionCounts } from "@/lib/actions/reaction-utils";
 import type { Action } from "@/lib/types/action";
 import type { Team } from "@/lib/types/team";
 import { getTeamAccentColor, getTeamAvatarTextColor } from "@/lib/utils/teamAccent";
@@ -83,10 +84,10 @@ export function FollowedTeamsFeed({
                   </p>
                   <div className="flex items-center gap-2 pt-1">
                     <span className="pointer-events-auto">
-                      <LikeButton
+                      <ReactionPicker
                         actionId={nextAction.id}
-                        initialIsLiked={nextAction.likedByUids?.includes(currentUid) ?? false}
-                        initialCount={nextAction.likedByUids?.length ?? 0}
+                        initialCounts={getReactionCounts(nextAction.reactions ?? {})}
+                        initialMyReaction={(nextAction.reactions ?? {})[currentUid] ?? null}
                       />
                     </span>
                     <Link

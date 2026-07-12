@@ -14,11 +14,13 @@ export async function createComment(
   authorDisplayName: string,
   authorPhotoURL: string | null,
   text: string,
+  parentCommentId: string | null,
 ): Promise<string> {
   const ref = commentsCollection.doc();
   const newComment: Omit<Comment, "id" | "createdAt" | "updatedAt"> = {
     actionId,
     teamId,
+    parentCommentId,
     authorUid,
     authorDisplayName,
     authorPhotoURL,

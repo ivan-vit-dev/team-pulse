@@ -5,7 +5,10 @@ import { ActionAdminList } from "@/components/actions/ActionAdminList";
 import { AdminList, type AdminSummary } from "@/components/teams/AdminList";
 import { EditTeamForm } from "@/components/teams/EditTeamForm";
 import { InviteAdminForm } from "@/components/teams/InviteAdminForm";
+import { InviteFanForm } from "@/components/teams/InviteFanForm";
+import { PendingFollowInvitesList } from "@/components/teams/PendingFollowInvitesList";
 import { PendingInvitesList } from "@/components/teams/PendingInvitesList";
+import { ShareFollowLinkButton } from "@/components/teams/ShareFollowLinkButton";
 import { ReportsAdminList, type ReportSummary } from "@/components/reports/ReportsAdminList";
 import { SeasonAdminList } from "@/components/seasons/SeasonAdminList";
 import { SeasonSwitcher } from "@/components/seasons/SeasonSwitcher";
@@ -21,6 +24,7 @@ import { buildReportPreview } from "@/lib/reports/report-preview";
 import { listReportsForTeam } from "@/lib/reports/report-repository";
 import { listSeasonsForTeam } from "@/lib/seasons/season-repository";
 import { listInvitesForTeam } from "@/lib/teams/admin-invite-repository";
+import { listInvitesForTeam as listFollowInvitesForTeam } from "@/lib/teams/follow-invite-repository";
 import { getTeam, isTeamAdmin } from "@/lib/teams/team-repository";
 import { getUserProfile } from "@/lib/users/user-repository";
 import { omit } from "@/lib/utils/omit";
@@ -41,17 +45,19 @@ export default async function TeamAdminPage({
     notFound();
   }
 
-  const [t, ts, ta, tr, adminProfiles, invites, players, seasons, reports] = await Promise.all([
-    getTranslations("teams"),
-    getTranslations("seasons"),
-    getTranslations("actions"),
-    getTranslations("reports"),
-    Promise.all(team.adminUids.map((adminUid) => getUserProfile(adminUid))),
-    listInvitesForTeam(teamId),
-    listPlayersForTeamWithPrivate(teamId),
-    listSeasonsForTeam(teamId),
-    listReportsForTeam(teamId),
-  ]);
+  const [t, ts, ta, tr, adminProfiles, invites, followInvites, players, seasons, reports] =
+    await Promise.all([
+      getTranslations("teams"),
+      getTranslations("seasons"),
+      getTranslations("actions"),
+      getTranslations("reports"),
+      Promise.all(team.adminUids.map((adminUid) => getUserProfile(adminUid))),
+      listInvitesForTeam(teamId),
+      listFollowInvitesForTeam(teamId),
+      listPlayersForTeamWithPrivate(teamId),
+      listSeasonsForTeam(teamId),
+      listReportsForTeam(teamId),
+    ]);
 
   const pendingReports = reports.filter((report) => report.status === "pending");
   const reportSummaries: ReportSummary[] = await Promise.all(
@@ -107,10 +113,13 @@ export default async function TeamAdminPage({
         >
           <div className="flex flex-wrap items-center justify-between gap-4">
             <TeamLogoUploader teamId={teamId} teamName={team.name} logoURL={team.logoURL} />
-            <Button
-              variant="outline"
-              render={<Link href={`/teams/${teamId}`}>{t("viewTeamPage")}</Link>}
-            />
+            <div className="flex gap-2">
+              <ShareFollowLinkButton teamId={teamId} teamName={team.name} />
+              <Button
+                variant="outline"
+                render={<Link href={`/teams/${teamId}`}>{t("viewTeamPage")}</Link>}
+              />
+            </div>
           </div>
           <h1 className="font-impact mt-5 text-4xl uppercase">{team.name}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -145,19 +154,34 @@ export default async function TeamAdminPage({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <h2 className="font-display text-lg font-bold">{t("admins")}</h2>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <AdminList teamId={teamId} admins={admins} />
-            <InviteAdminForm teamId={teamId} />
-            <PendingInvitesList
-              teamId={teamId}
-              invites={invites.map((invite) => omit(invite, "createdAt", "updatedAt"))}
-            />
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <h2 className="font-display text-lg font-bold">{t("admins")}</h2>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <AdminList teamId={teamId} admins={admins} />
+              <InviteAdminForm teamId={teamId} />
+              <PendingInvitesList
+                teamId={teamId}
+                invites={invites.map((invite) => omit(invite, "createdAt", "updatedAt"))}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <h2 className="font-display text-lg font-bold">{t("fans")}</h2>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <InviteFanForm teamId={teamId} />
+              <PendingFollowInvitesList
+                teamId={teamId}
+                invites={followInvites.map((invite) => omit(invite, "createdAt", "updatedAt"))}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <Card>
@@ -211,7 +235,7 @@ export default async function TeamAdminPage({
                 />
               )}
             </div>
-            {selectedSeason && (
+            {selectedSeason && !selectedSeason.isArchived && (
               <Button
                 size="sm"
                 render={
@@ -228,6 +252,7 @@ export default async function TeamAdminPage({
                 teamId={teamId}
                 seasonId={selectedSeason.id}
                 actions={actionsForSeason.map((action) => omit(action, "createdAt", "updatedAt"))}
+                seasonArchived={selectedSeason.isArchived}
               />
             ) : (
               <p className="text-sm text-muted-foreground">{ta("noActiveSeason")}</p>
